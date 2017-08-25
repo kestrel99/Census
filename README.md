@@ -1,6 +1,7 @@
 # Census
 A (now rather old-fashioned) run manager for NONMEM.
 
+## Release Notes
 v. 2.9 (25/08/2017)
 Justin Wilkins (justin.wilkins@occams.com)
 
