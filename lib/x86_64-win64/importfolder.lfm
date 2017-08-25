@@ -1,0 +1,109 @@
+object frmImportFolder: TfrmImportFolder
+  Left = 433
+  Height = 557
+  Top = 260
+  Width = 636
+  BorderStyle = bsDialog
+  Caption = 'Import folder...'
+  ClientHeight = 557
+  ClientWidth = 636
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '1.0.14.0'
+  Visible = True
+  object grpFiles: TGroupBox
+    Left = 8
+    Height = 504
+    Top = 8
+    Width = 336
+    Caption = 'Folder to Import'
+    ClientHeight = 482
+    ClientWidth = 328
+    TabOrder = 0
+    object stvDir: TShellTreeView
+      Left = 0
+      Height = 482
+      Top = 0
+      Width = 328
+      Align = alClient
+      AutoExpand = True
+      Font.Height = -11
+      FileSortType = fstNone
+      ParentFont = False
+      ReadOnly = True
+      RowSelect = True
+      TabOrder = 0
+      OnChange = stvDirChange
+      Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoRowSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+      ObjectTypes = [otFolders]
+    end
+  end
+  object btnImport: TButton
+    Left = 464
+    Height = 25
+    Top = 520
+    Width = 75
+    Caption = 'Import'
+    OnClick = btnImportClick
+    TabOrder = 1
+  end
+  object btnCancel: TButton
+    Left = 549
+    Height = 25
+    Top = 520
+    Width = 75
+    Caption = 'Cancel'
+    OnClick = btnCancelClick
+    TabOrder = 2
+  end
+  object GroupBox1: TGroupBox
+    Left = 352
+    Height = 504
+    Top = 8
+    Width = 272
+    Caption = 'Files to Import'
+    ClientHeight = 482
+    ClientWidth = 264
+    TabOrder = 3
+    object clbFiles: TCheckListBox
+      Left = 0
+      Height = 450
+      Top = 0
+      Width = 264
+      Font.Height = -11
+      ItemHeight = 0
+      ParentFont = False
+      TabOrder = 0
+    end
+    object btnAll: TButton
+      Left = 0
+      Height = 25
+      Top = 454
+      Width = 130
+      Caption = 'All'
+      OnClick = btnAllClick
+      TabOrder = 1
+    end
+    object btnNone: TButton
+      Left = 134
+      Height = 25
+      Top = 454
+      Width = 130
+      Caption = 'None'
+      OnClick = btnNoneClick
+      TabOrder = 2
+    end
+  end
+  object chkWarn: TCheckBox
+    Left = 8
+    Height = 18
+    Top = 520
+    Width = 135
+    Caption = 'Warn on overwrite'
+    Checked = True
+    State = cbChecked
+    TabOrder = 4
+  end
+end

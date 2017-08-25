@@ -1,0 +1,40 @@
+object frmProgress: TfrmProgress
+  Left = 1120
+  Height = 77
+  Top = 690
+  Width = 319
+  Caption = 'Importing...'
+  ClientHeight = 77
+  ClientWidth = 319
+  FormStyle = fsStayOnTop
+  OnKeyDown = FormKeyDown
+  Position = poScreenCenter
+  LCLVersion = '0.9.30.4'
+  Visible = True
+  object prgImport: TProgressBar
+    Left = 8
+    Height = 20
+    Top = 8
+    Width = 304
+    Smooth = True
+    Step = 1
+    TabOrder = 0
+  end
+  object pnlImport: TPanel
+    Left = 8
+    Height = 26
+    Top = 24
+    Width = 304
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 8
+    Height = 13
+    Top = 56
+    Width = 116
+    Caption = 'Press ESC to interrupt...'
+    Font.Height = -10
+    ParentColor = False
+    ParentFont = False
+  end
+end

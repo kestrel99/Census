@@ -1,0 +1,38 @@
+object frmFailImports: TfrmFailImports
+  Left = 843
+  Height = 398
+  Top = 326
+  Width = 520
+  Caption = 'Import failures...'
+  ClientHeight = 398
+  ClientWidth = 520
+  OnClose = FormClose
+  LCLVersion = '0.9.30.4'
+  object Memo1: TMemo
+    Left = 8
+    Height = 321
+    Top = 32
+    Width = 507
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 8
+    Height = 17
+    Top = 8
+    Width = 352
+    Caption = 'The following XML files were not successfully imported:'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 445
+    Height = 20
+    Top = 363
+    Width = 70
+    Anchors = [akRight, akBottom]
+    Caption = '&Close'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+end
