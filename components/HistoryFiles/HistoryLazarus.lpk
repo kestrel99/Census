@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <PathDelim Value="\"/>
+    <Name Value="HistoryLazarus"/>
+    <Author Value="Andrea Russo"/>
+    <CompilerOptions>
+      <Version Value="8"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib"/>
+      </SearchPaths>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Description Value="THistoryFiles version 1.2.1
+
+"/>
+    <License Value="LGPL
+"/>
+    <Version Major="1" Minor="2" Release="1"/>
+    <Files Count="2">
+      <Item1>
+        <Filename Value="HistoryLazarus.lrs"/>
+        <Type Value="LRS"/>
+      </Item1>
+      <Item2>
+        <Filename Value="HistoryFiles.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="HistoryFiles"/>
+      </Item2>
+    </Files>
+    <Type Value="RunAndDesignTime"/>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)\"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <DestinationDirectory Value="$(TestDir)\publishedpackage\"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
