@@ -1,0 +1,81 @@
+<!ELEMENT nm:output ( nm:start_datetime | nm:control_stream | nm:nmtran | nm:nonmem | nm:stop_datetime )*>
+<!ATTLIST nm:output xmlns:nm CDATA #IMPLIED xmlns:xsi CDATA #IMPLIED xsi:schemaLocation CDATA #IMPLIED>
+<!ELEMENT nm:start_datetime (#PCDATA)>
+<!ELEMENT nm:stop_datetime (#PCDATA)>
+<!ELEMENT nm:control_stream (#PCDATA)>
+<!ELEMENT nm:nmtran (#PCDATA)>
+<!ELEMENT nm:nonmem (nm:problem | nm:license_information | nm:program_information)*>
+<!ATTLIST nm:nonmem nm:version CDATA #IMPLIED>
+<!ELEMENT nm:license_information (#PCDATA)>
+<!ELEMENT nm:program_information (#PCDATA)>
+<!ELEMENT nm:problem (nm:problem_title | nm:problem_information | nm:simulation_information | nm:estimation | nm:table | nm:scatter)*>
+<!ATTLIST nm:problem nm:number CDATA #IMPLIED nm:subproblem CDATA  #IMPLIED nm:superproblem1 CDATA  #IMPLIED nm:iteration1 CDATA  #IMPLIED nm:superproblem2 CDATA  #IMPLIED nm:iteration2 CDATA #IMPLIED >
+<!ELEMENT nm:problem_title (#PCDATA)>
+<!ELEMENT nm:problem_information (#PCDATA)>
+<!ELEMENT nm:simulation_information (#PCDATA)>
+<!ELEMENT nm:estimation (nm:parallel_est | nm:table_series | nm:estimation_method | nm:estimation_title | nm:monitor 
+          | nm:estimation_elapsed_time | nm:parallel_cov 
+          | nm:termination_status | nm:termination_information | nm:etabar | nm:etabarse | nm:etabarpval | nm:etashrink 
+          | nm:epsshrink | nm:covariance_information | nm:covariance_status | nm:covariance_elapsed_time
+          | nm:final_objective_function_text | nm:final_objective_function | nm:final_objective_function_std 
+          | nm:theta | nm:omega | nm:sigma | nm:omegac | nm:sigmac | nm:thetase | nm:omegase | nm:sigmase
+          | nm:omegacse | nm:sigmacse | nm:covariance | nm:correlation | nm:invcovariance | nm:eigenvalues 
+          | nm:rmatrix | nm:smatrix | thetanp | exnpeta |  covnpeta | covnpetac | omeganp | omeganpc )*>
+<!ATTLIST nm:estimation nm:number CDATA  #IMPLIED nm:type CDATA  #IMPLIED>
+<!ELEMENT nm:parallel_est EMPTY>
+<!ATTLIST nm:parallel_est nm:parafile CDATA #IMPLIED nm:protocol CDATA #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:table_series (#PCDATA)>
+<!ELEMENT nm:estimation_method (#PCDATA)>
+<!ELEMENT nm:estimation_title (#PCDATA)>
+<!ELEMENT nm:monitor (nm:obj)*>
+<!ELEMENT nm:estimation_elapsed_time (#PCDATA)>
+<!ELEMENT nm:termination_status (#PCDATA)>
+<!ELEMENT nm:termination_information (#PCDATA)>
+<!ELEMENT nm:etabar (nm:row)*>
+<!ELEMENT nm:etabarse (nm:row)*>
+<!ELEMENT nm:etabarpval (nm:row)*>
+<!ELEMENT nm:etashrink (nm:row)*>
+<!ELEMENT nm:epsshrink (nm:row)*>
+<!ELEMENT nm:parallel_cov EMPTY>
+<!ATTLIST nm:parallel_cov nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:covariance_information (#PCDATA)>
+<!ELEMENT nm:covariance_status EMPTY>
+<!ATTLIST nm:covariance_status nm:error CDATA #IMPLIED nm:numnegeigenvalues CDATA  #IMPLIED nm:mineigenvalue CDATA  #IMPLIED nm:maxeigenvalue CDATA  #IMPLIED nm:rms CDATA #IMPLIED >
+<!ELEMENT nm:covariance_elapsed_time (#PCDATA)>
+<!ELEMENT nm:final_objective_function_text (#PCDATA)>
+<!ELEMENT nm:final_objective_function (#PCDATA)>
+<!ELEMENT nm:final_objective_function_std (#PCDATA)>
+<!ELEMENT nm:theta (nm:val)*>
+<!ELEMENT nm:omega (nm:row)*>
+<!ELEMENT nm:sigma (nm:row)*>
+<!ELEMENT nm:omegac (nm:row)*>
+<!ELEMENT nm:sigmac (nm:row)*>
+<!ELEMENT nm:omegacse (nm:row)*>
+<!ELEMENT nm:sigmacse (nm:row)*>
+<!ELEMENT nm:thetase (nm:val)*>
+<!ELEMENT nm:omegase (nm:row)*>
+<!ELEMENT nm:sigmase (nm:row)*>
+<!ELEMENT nm:exnpeta (nm:val)*>
+<!ELEMENT nm:thetanp (nm:val)*>
+<!ELEMENT nm:covnpeta (nm:row)*>
+<!ELEMENT nm:covnpetac (nm:row)*>
+<!ELEMENT nm:omeganp (nm:row)*>
+<!ELEMENT nm:omeganpc (nm:row)*>
+<!ELEMENT nm:covariance (nm:row)*>
+<!ELEMENT nm:correlation (nm:row)*>
+<!ELEMENT nm:invcovariance (nm:row)*>
+<!ELEMENT nm:rmatrix (nm:row)*>
+<!ELEMENT nm:smatrix (nm:row)*>
+<!ELEMENT nm:eigenvalues (nm:val)*>
+<!ELEMENT nm:obj (#PCDATA)>
+<!ATTLIST nm:obj nm:iteration CDATA #IMPLIED nm:effective CDATA #IMPLIED nm:sample CDATA  #IMPLIED nm:fitness CDATA #IMPLIED>
+<!ELEMENT nm:val (#PCDATA)>
+<!ATTLIST nm:val nm:name CDATA #IMPLIED>
+<!ELEMENT nm:row (nm:col)*>
+<!ATTLIST nm:row nm:rname CDATA #IMPLIED>
+<!ELEMENT nm:col (#PCDATA)>
+<!ATTLIST nm:col nm:cname CDATA #IMPLIED>
+<!ELEMENT nm:table (nm:row)*>
+<!ATTLIST nm:table nm:number CDATA #IMPLIED>
+<!ELEMENT nm:scatter (#PCDATA)>
+<!ATTLIST nm:scatter nm:number CDATA  #IMPLIED nm:ord CDATA  #IMPLIED nm:abs CDATA #IMPLIED>

@@ -1,0 +1,14 @@
+CENSUS 2 CHANGELOG----------------v. 2.9 (25/08/2017)  Justin Wilkins (justin.wilkins@occams.com)=======
+25/08/2017 (2.9)----------* UPDATED: User interface, to allow scaling to larger Windows displays without "fuzziness"* FIXED: Numerous tiny but annoying bugs * NEW: The project has been moved to GitHub ()
+04/12/2013 (2.03)----------
+
+* ADJUSTED: “Import folder” now defaults to location of current Census data file
+* FIXED: The “Import folder” dialog no longer displays an annoying warning message when a folder with no runs is selected
+
+10/07/2013 (2.02)----------
+
+* FIXED: CSV export did not include "Comment" field
+* FIXED: Control streams requesting an Initial Estimates Step were not properly handled08/07/2013 (2.01)----------
+
+* FIXED: Numerous minor issues
+=======15/02/2013 (2.0)----------* ADDED: PSN: Simple support for PsN data (bootstraps, VPCs, etc)* ADDED: RUN RECORDS: Ability to export run records in CSV, HTML and LaTeX added* ADDED: PARAMETER TABLES: Ability to export parameter tables in HTML or LaTeX added* ADDED: Human-readable renditions of ext, phi, phm, shk, grd and cnv tables* ADDED: Context-based highlighting in Estimation panel * FIXED: $OMEGA and $SIGMA initial estimates now imported correctly* FIXED: Issue with importing run folders with spaces in them* FIXED: Zipped archives of runs are now prepared correctly* FIXED: Issues with importing mixture models* FIXED: Some issues with importing parameter labels* DROPPED: Source data file display, owing to logistical problems (if anyone wants this back, please let me know)11/05/2012 (2.0 b1)----------* FIRST RELEASE: complete rewrite of the original code; this is not an update of Census,       per se, but is instead a completely new application, with significant changes made      to almost every aspect of the original program. 

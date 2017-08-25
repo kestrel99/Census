@@ -1,0 +1,129 @@
+object frmCompare: TfrmCompare
+  Left = 517
+  Height = 690
+  Top = 203
+  Width = 1029
+  BiDiMode = bdRightToLeft
+  Caption = 'Compare Runs'
+  ClientHeight = 690
+  ClientWidth = 1029
+  OnClose = FormClose
+  OnShow = FormShow
+  ParentBiDiMode = False
+  Position = poScreenCenter
+  LCLVersion = '1.0.4.0'
+  Visible = True
+  object Splitter1: TSplitter
+    Cursor = crVSplit
+    Left = 0
+    Height = 5
+    Top = 643
+    Width = 1029
+    Align = alBottom
+    ResizeAnchor = akBottom
+    ResizeStyle = rsNone
+  end
+  object Panel21: TPanel
+    Left = 0
+    Height = 42
+    Top = 648
+    Width = 1029
+    Align = alBottom
+    Anchors = [akLeft, akBottom]
+    ClientHeight = 42
+    ClientWidth = 1029
+    TabOrder = 1
+    object btnExport: TButton
+      Left = 827
+      Height = 25
+      Top = 8
+      Width = 91
+      Anchors = [akTop, akRight]
+      Caption = 'Export...'
+      ParentBidiMode = False
+      OnClick = btnExportClick
+      TabOrder = 0
+    end
+    object Button1: TButton
+      Left = 931
+      Height = 25
+      Top = 8
+      Width = 91
+      Anchors = [akTop, akRight]
+      Caption = 'Close'
+      OnClick = Button1Click
+      TabOrder = 1
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 643
+    Top = 0
+    Width = 1029
+    Align = alClient
+    Caption = 'Panel1'
+    ClientHeight = 643
+    ClientWidth = 1029
+    TabOrder = 2
+    object GroupBox1: TGroupBox
+      Left = 8
+      Height = 627
+      Top = 8
+      Width = 1014
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      Caption = 'Runs in Project'
+      ClientHeight = 609
+      ClientWidth = 1010
+      TabOrder = 0
+      object grdCompare: TStringGrid
+        Left = 4
+        Height = 600
+        Top = 4
+        Width = 1004
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        ColCount = 1
+        DefaultRowHeight = 21
+        Flat = True
+        Font.Height = -11
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goColMoving, goRowSelect, goDblClickAutoSize]
+        ParentBiDiMode = False
+        ParentFont = False
+        RowCount = 1
+        TabOrder = 0
+        TitleFont.Height = -11
+      end
+    end
+  end
+  object qrySumTh: TZReadOnlyQuery
+    Connection = frmMain.zConn
+    Params = <>
+    left = 732
+    top = 540
+  end
+  object qryRuns: TZReadOnlyQuery
+    Connection = frmMain.zConn
+    Params = <>
+    left = 732
+    top = 488
+  end
+  object dlgSave: TSaveDialog
+    Title = 'Export as'
+    DefaultExt = '.csv'
+    Filter = 'Comma-separated values (*.csv)|*.csv'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    left = 796
+    top = 488
+  end
+  object qrySumOm: TZReadOnlyQuery
+    Connection = frmMain.zConn
+    Params = <>
+    left = 796
+    top = 540
+  end
+  object qrySumSi: TZReadOnlyQuery
+    Connection = frmMain.zConn
+    Params = <>
+    left = 856
+    top = 540
+  end
+end

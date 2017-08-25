@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://namespaces.oreilly.com/xmlnut/address"
+xmlns:nm="http://namespaces.oreilly.com/xmlnut/address"
+elementFormDefault="qualified"
+attributeFormDefault="qualified">
+
+<xs:element name="output">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="start_datetime" type="xs:dateTime"/>
+      <xs:element name="control_stream" type="xs:string"/>
+      <xs:element name="nmtran" type="xs:string"/>
+      <xs:element name="nonmem">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="license_information" type="xs:string"/>
+            <xs:element name="program_information" type="xs:string"/>
+            <xs:element name="problem" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="problem_title" type="xs:string"/>
+                  <xs:element name="problem_information" type="xs:string"/>
+                  <xs:element name="simulation_information" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                  <xs:element name="estimation" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="parallel_est" minOccurs="0" maxOccurs="1">
+                          <xs:complexType>
+                            <xs:attribute name="parafile" type="xs:string" use="required"/>
+                            <xs:attribute name="protocol" type="xs:string" use="required"/>
+                            <xs:attribute name="nodes" type="xs:integer" use="required"/>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="table_series" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="estimation_method" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="estimation_title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="monitor" minOccurs="0" maxOccurs="1">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="obj" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                  <xs:simpleContent>
+                                    <xs:extension base="xs:double">
+                                    <xs:attribute name="iteration" type="xs:integer" use="required"/>
+                                    <xs:attribute name="sample" type="xs:double" use="optional"/>
+                                    <xs:attribute name="effective" type="xs:double" use="optional"/>
+                                    <xs:attribute name="fitness" type="xs:double" use="optional"/>
+                                    </xs:extension>
+                                  </xs:simpleContent>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="termination_status" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="termination_information" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="etabar" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="etabarse" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="etabarpval" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="etashrink" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="epsshrink" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="estimation_elapsed_time" type="xs:double" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="parallel_cov" minOccurs="0" maxOccurs="1">
+                          <xs:complexType>
+                            <xs:attribute name="parafile" type="xs:string" use="required"/>
+                            <xs:attribute name="protocol" type="xs:string" use="required"/>
+                            <xs:attribute name="nodes" type="xs:integer" use="required"/>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="covariance_information" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="covariance_status" minOccurs="0" maxOccurs="1">
+                          <xs:complexType>
+                            <xs:attribute name="error" type="xs:integer" use="required"/>
+                            <xs:attribute name="numnegeigenvalues" type="xs:integer" use="required"/>
+                            <xs:attribute name="mineigenvalue" type="xs:double" use="required"/>
+                            <xs:attribute name="maxeigenvalue" type="xs:double" use="required"/>
+                            <xs:attribute name="rms" type="xs:double" use="required"/>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="covariance_elapsed_time" type="xs:double" minOccurs="0" maxOccurs="1" />
+                        <xs:element name="final_objective_function_text" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="final_objective_function" type="xs:double" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="final_objective_function_std"  minOccurs="0" maxOccurs="1" type="xs:double"/>
+                        <xs:element name="theta" minOccurs="0" maxOccurs="1" type="nm:vector"/>
+                        <xs:element name="omega" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="sigma" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="omegac" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="sigmac" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="thetase" minOccurs="0" maxOccurs="1" type="nm:vector"/>
+                        <xs:element name="omegase" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="sigmase" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="omegacse" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="sigmacse" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="covariance" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="correlation" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="invcovariance" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="rmatrix" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="smatrix" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="eigenvalues" minOccurs="0" maxOccurs="1" type="nm:vector"/>
+                        <xs:element name="thetanp" minOccurs="0" maxOccurs="1" type="nm:vector"/>
+                        <xs:element name="exnpeta" minOccurs="0" maxOccurs="1" type="nm:vector"/>
+                        <xs:element name="covnpeta" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="omeganp" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="covnpetac" minOccurs="0" maxOccurs="1" type="nm:table"/>
+                        <xs:element name="omeganpc" minOccurs="0" maxOccurs="1" type="nm:table"/>                       
+                      </xs:sequence>
+                      <xs:attribute name="number" type="xs:integer" use="required"/>
+                      <xs:attribute name="type" type="xs:integer" use="required"/>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="table" minOccurs="0" maxOccurs="unbounded" type="nm:table"/>
+                  <xs:element name="scatter" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                          <xs:attribute name="number" type="xs:integer" use="required"/>
+                          <xs:attribute name="ord" type="xs:string" use="required"/>
+                          <xs:attribute name="abs" type="xs:string" use="required"/>
+                        </xs:extension>
+                      </xs:simpleContent>
+                    </xs:complexType>                  
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="number" type="xs:integer" use="required"/>
+                <xs:attribute name="subproblem" type="xs:integer" use="required"/>
+                <xs:attribute name="superproblem1" type="xs:integer" use="required"/>
+                <xs:attribute name="iteration1" type="xs:integer" use="required"/>
+                <xs:attribute name="superproblem2" type="xs:integer" use="required"/>
+                <xs:attribute name="iteration2" type="xs:integer" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="version" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="stop_datetime" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="table">
+  <xs:sequence>
+    <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="col" minOccurs="1" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:double">
+                  <xs:attribute name="cname" type="xs:string" use="optional"/>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="rname" use="optional" type="xs:string"/>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="number" use="optional" type="xs:integer"/>
+</xs:complexType>
+
+<xs:complexType name="vector">
+  <xs:sequence>
+    <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    <xs:element name="val" minOccurs="1" maxOccurs="unbounded">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:double">
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="number" use="optional" type="xs:integer"/>
+</xs:complexType>
+
+
+</xs:schema>

@@ -1,0 +1,8 @@
+<!ELEMENT nm:tables ( nm:table )*>
+<!ATTLIST nm:tables xmlns:nm CDATA #IMPLIED xmlns:xsi CDATA #IMPLIED xsi:schemaLocation CDATA #IMPLIED>
+<!ELEMENT nm:row (nm:col)*>
+<!ATTLIST nm:row nm:rname CDATA #IMPLIED>
+<!ELEMENT nm:col (#PCDATA)>
+<!ATTLIST nm:col nm:cname CDATA #IMPLIED>
+<!ELEMENT nm:table (nm:row)*>
+<!ATTLIST nm:table nm:number CDATA #IMPLIED  nm:title CDATA #IMPLIED>

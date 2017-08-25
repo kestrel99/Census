@@ -1,0 +1,508 @@
+object frmEdit: TfrmEdit
+  Left = 990
+  Height = 548
+  Top = 446
+  Width = 580
+  BorderStyle = bsDialog
+  Caption = 'Edit record'
+  ClientHeight = 548
+  ClientWidth = 580
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.30.4'
+  Visible = True
+  object GroupBox1: TGroupBox
+    Left = 16
+    Height = 56
+    Top = 16
+    Width = 300
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Run'
+    ClientHeight = 34
+    ClientWidth = 292
+    TabOrder = 0
+    object txtRunNo: TDBText
+      Left = 12
+      Height = 1
+      Top = 10
+      Width = 1
+      DataField = 'RunNo'
+      DataSource = srcEdit
+      ParentColor = False
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 16
+    Height = 48
+    Top = 80
+    Width = 547
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Label'
+    ClientHeight = 26
+    ClientWidth = 539
+    TabOrder = 1
+    object txtLabel: TDBText
+      Left = 12
+      Height = 1
+      Top = 6
+      Width = 1
+      DataField = 'Comment'
+      DataSource = srcEdit
+      ParentColor = False
+    end
+  end
+  object GroupBox3: TGroupBox
+    Left = 330
+    Height = 56
+    Top = 16
+    Width = 233
+    Anchors = [akTop, akRight]
+    Caption = 'Parent'
+    ClientHeight = 34
+    ClientWidth = 225
+    TabOrder = 2
+    object cbxParentNo: TComboBox
+      Left = 13
+      Height = 20
+      Top = 6
+      Width = 200
+      ItemHeight = 0
+      Style = csDropDownList
+      TabOrder = 0
+    end
+  end
+  object GroupBox4: TGroupBox
+    Left = 16
+    Height = 232
+    Top = 136
+    Width = 547
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Xpose'
+    ClientHeight = 210
+    ClientWidth = 539
+    TabOrder = 3
+    object edtSdtab: TFileNameEdit
+      Left = 60
+      Height = 22
+      Top = 14
+      Width = 440
+      DialogOptions = []
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 0
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 0
+    end
+    object Label1: TLabel
+      Left = 4
+      Height = 17
+      Top = 16
+      Width = 36
+      Caption = 'sdtab'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 4
+      Height = 17
+      Top = 48
+      Width = 37
+      Caption = 'patab'
+      ParentColor = False
+    end
+    object edtPatab: TFileNameEdit
+      Left = 60
+      Height = 22
+      Top = 46
+      Width = 440
+      DialogOptions = []
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 0
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 1
+    end
+    object Label3: TLabel
+      Left = 4
+      Height = 17
+      Top = 80
+      Width = 35
+      Caption = 'catab'
+      ParentColor = False
+    end
+    object edtCatab: TFileNameEdit
+      Left = 60
+      Height = 22
+      Top = 78
+      Width = 440
+      DialogOptions = []
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 0
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 2
+    end
+    object Label4: TLabel
+      Left = 4
+      Height = 17
+      Top = 112
+      Width = 36
+      Caption = 'cotab'
+      ParentColor = False
+    end
+    object edtCotab: TFileNameEdit
+      Left = 60
+      Height = 22
+      Top = 110
+      Width = 440
+      DialogOptions = []
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 0
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 3
+    end
+    object Label5: TLabel
+      Left = 4
+      Height = 17
+      Top = 144
+      Width = 40
+      Caption = 'mytab'
+      ParentColor = False
+    end
+    object edtMytab: TFileNameEdit
+      Left = 60
+      Height = 22
+      Top = 142
+      Width = 440
+      DialogOptions = []
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 0
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 4
+    end
+    object Label6: TLabel
+      Left = 4
+      Height = 17
+      Top = 176
+      Width = 41
+      Caption = 'mutab'
+      ParentColor = False
+    end
+    object edtMutab: TFileNameEdit
+      Left = 60
+      Height = 22
+      Top = 174
+      Width = 440
+      DialogOptions = []
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 0
+      Anchors = [akTop, akLeft, akRight]
+      MaxLength = 0
+      TabOrder = 5
+    end
+  end
+  object btnSave: TButton
+    Left = 404
+    Height = 25
+    Top = 512
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = '&Save'
+    OnClick = btnSaveClick
+    TabOrder = 4
+  end
+  object btnCancel: TButton
+    Left = 489
+    Height = 25
+    Top = 512
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Cancel'
+    OnClick = btnCancelClick
+    TabOrder = 5
+  end
+  object GroupBox5: TGroupBox
+    Left = 16
+    Height = 136
+    Top = 368
+    Width = 547
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Comments'
+    ClientHeight = 114
+    ClientWidth = 539
+    TabOrder = 6
+    object DBMemo1: TDBMemo
+      Left = 12
+      Height = 96
+      Top = 6
+      Width = 513
+      Anchors = [akTop, akLeft, akRight]
+      DataField = 'Comments'
+      DataSource = srcEdit
+      TabOrder = 0
+    end
+  end
+  object qryEdit: TZQuery
+    Connection = frmMain.zConn
+    SQL.Strings = (
+      'select RunNo,ParentNo,Comment,Comments,sdtab,patab,cotab,catab,mytab,mutab,sdtabMD5,patabMD5,cotabMD5,catabMD5,mytabMD5,mutabMD5,OFV'
+      'from runs;'
+    )
+    Params = <>
+    left = 104
+    top = 192
+    object qryEditRunNo: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'RunNo'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditRunNoGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditParentNo: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'ParentNo'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditParentNoGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditsdtab: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'sdtab'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditsdtabGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditpatab: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'patab'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditpatabGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditcotab: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'cotab'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditcotabGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditcatab: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'catab'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditcatabGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditmytab: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'mytab'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditmytabGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditmutab: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'mutab'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditmutabGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditsdtabMD5: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'sdtabMD5'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditsdtabMD5GetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditpatabMD5: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'patabMD5'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditpatabMD5GetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditcotabMD5: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'cotabMD5'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditcotabMD5GetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditcatabMD5: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'catabMD5'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditcatabMD5GetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditmytabMD5: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'mytabMD5'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditmytabMD5GetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditmutabMD5: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'mutabMD5'
+      Index = 13
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditmutabMD5GetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditComment: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'Comment'
+      Index = 14
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditCommentGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditComments: TMemoField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'Comments'
+      Index = 15
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = qryEditCommentsGetText
+      BlobType = ftBlob
+      Transliterate = False
+    end
+    object qryEditOFV: TFloatField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'OFV'
+      Index = 16
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      MaxValue = 0
+      MinValue = 0
+      Precision = 2
+    end
+  end
+  object srcEdit: TDatasource
+    DataSet = qryEdit
+    left = 152
+    top = 192
+  end
+  object qryEx: TZQuery
+    Connection = frmMain.zConn
+    Params = <>
+    left = 104
+    top = 248
+  end
+  object qryCbx: TZQuery
+    Connection = frmMain.zConn
+    Params = <>
+    DataSource = frmMain.dsRuns
+    left = 104
+    top = 288
+  end
+end

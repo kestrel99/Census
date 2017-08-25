@@ -1,0 +1,36 @@
+object frmXML: TfrmXML
+  Left = 525
+  Height = 632
+  Top = 299
+  Width = 846
+  Caption = 'XML'
+  ClientHeight = 632
+  ClientWidth = 846
+  LCLVersion = '0.9.30'
+  object Button1: TButton
+    Left = 757
+    Height = 25
+    Top = 584
+    Width = 75
+    Caption = 'Button1'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Memo: TMemo
+    Left = 24
+    Height = 546
+    Top = 24
+    Width = 808
+    TabOrder = 1
+    Visible = False
+  end
+  object TreeView1: TTreeView
+    Left = 24
+    Height = 545
+    Top = 24
+    Width = 809
+    DefaultItemHeight = 18
+    TabOrder = 2
+    Visible = False
+  end
+end
