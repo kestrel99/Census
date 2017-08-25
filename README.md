@@ -1,4 +1,5 @@
-# Census
+![alt tag](https://github.com/kestrel99/Census/blob/master/rect3040.png)
+
 A (now rather old-fashioned) run manager for NONMEM.
 
 ## Release Notes
