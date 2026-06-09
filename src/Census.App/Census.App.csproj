@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Census.Import\Census.Import.csproj" />
+    <ProjectReference Include="..\Census.Storage\Census.Storage.csproj" />
+    <ProjectReference Include="..\Census.Reports\Census.Reports.csproj" />
+    <ProjectReference Include="..\Census.Archive\Census.Archive.csproj" />
+    <ProjectReference Include="..\Census.ExternalTools\Census.ExternalTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" />
+    <!-- Run tree uses the built-in free TreeView. Avalonia.Controls.TreeDataGrid is a
+         commercial (Avalonia Accelerate) control and is intentionally not used. -->
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+
+</Project>

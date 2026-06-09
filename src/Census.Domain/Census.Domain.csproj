@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Pure domain models. No I/O, no framework dependencies. -->
+
+</Project>

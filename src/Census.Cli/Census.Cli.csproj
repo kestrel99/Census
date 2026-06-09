@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>census</AssemblyName>
+    <RootNamespace>Census.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Census.Import\Census.Import.csproj" />
+    <ProjectReference Include="..\Census.Storage\Census.Storage.csproj" />
+    <ProjectReference Include="..\Census.Reports\Census.Reports.csproj" />
+    <ProjectReference Include="..\Census.Archive\Census.Archive.csproj" />
+    <ProjectReference Include="..\Census.ExternalTools\Census.ExternalTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console.Cli" />
+  </ItemGroup>
+
+</Project>
