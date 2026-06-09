@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+
+jobs:
+  build-test:
+    name: Build & test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Census.slnx
+      - name: Build
+        run: dotnet build Census.slnx -c Release --no-restore
+      - name: Test
+        run: dotnet test Census.slnx -c Release --no-build
+
+  publish:
+    name: Publish single-file (${{ matrix.rid }})
+    needs: build-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: macos-latest
+            rid: osx-arm64
+          - os: macos-13
+            rid: osx-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Publish CLI
+        run: >
+          dotnet publish src/Census.Cli -c Release -r ${{ matrix.rid }}
+          --self-contained true -p:PublishSingleFile=true
+          -o artifacts/${{ matrix.rid }}/cli
+      - name: Publish App
+        run: >
+          dotnet publish src/Census.App -c Release -r ${{ matrix.rid }}
+          --self-contained true -p:PublishSingleFile=true
+          -o artifacts/${{ matrix.rid }}/app
+      # TODO: code signing.
+      #   Windows  -> Authenticode cert / Azure Trusted Signing + signtool (provision early).
+      #   macOS    -> Apple Developer ID: codesign + notarytool + stapler.
+      # Wire signing here using repository secrets before attaching release assets.
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: census-${{ matrix.rid }}
+          path: artifacts/${{ matrix.rid }}

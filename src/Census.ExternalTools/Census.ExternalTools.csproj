@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Process launching via in-box System.Diagnostics.Process. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Census.Domain\Census.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

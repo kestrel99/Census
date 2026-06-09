@@ -1,0 +1,23 @@
+# .NET build output
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+artifacts/
+publish/
+
+# Rider / Visual Studio
+.idea/
+.vs/
+*.user
+*.suo
+
+# Test results
+[Tt]est[Rr]esults/
+*.trx
+
+# Verify snapshot received files
+*.received.*
+
+# NuGet
+*.nupkg
+.nuget/

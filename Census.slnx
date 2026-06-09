@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Census.App/Census.App.csproj" />
+    <Project Path="src/Census.Archive/Census.Archive.csproj" />
+    <Project Path="src/Census.Cli/Census.Cli.csproj" />
+    <Project Path="src/Census.Domain/Census.Domain.csproj" />
+    <Project Path="src/Census.ExternalTools/Census.ExternalTools.csproj" />
+    <Project Path="src/Census.Import/Census.Import.csproj" />
+    <Project Path="src/Census.Reports/Census.Reports.csproj" />
+    <Project Path="src/Census.Storage/Census.Storage.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Census.Tests/Census.Tests.csproj" />
+  </Folder>
+</Solution>

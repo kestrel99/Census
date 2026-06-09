@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ZIP via in-box System.IO.Compression. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Census.Domain\Census.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
