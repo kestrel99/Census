@@ -86,7 +86,7 @@ via SQLitePCLRaw, and Avalonia bundles Skia.
 | | source-generated `Regex` (in-box) | Listing parsing; replaces vendored `regexpr.pas`. |
 | `Census.Storage` | `Microsoft.Data.Sqlite` | Native SQLite access. |
 | | `Dapper` | Fast, lean query → object mapping. |
-| | `DbUp-SQLite` | Versioned, idempotent migration scripts. |
+| | *(in-house migrator)* | Versioned, idempotent embedded-SQL migrations. Replaces the planned `DbUp-SQLite` to avoid pulling a second SQLite native engine into the process (keeps the dependency surface minimal). |
 | `Census.Reports` | `Scriban` | HTML/LaTeX templating (no runtime compilation, fast, trim-friendly). |
 | | `CsvHelper` | Correct CSV quoting/escaping (replaces hand-built strings). |
 | `Census.Archive` | `System.IO.Compression` (in-box) | ZIP creation (replaces Lazarus `Zipper`). |

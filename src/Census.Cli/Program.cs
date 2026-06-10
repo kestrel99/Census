@@ -5,6 +5,10 @@ var app = new CommandApp();
 app.Configure(config =>
 {
     config.SetApplicationName("census");
+    config.AddCommand<NewCommand>("new")
+        .WithDescription("Create a new empty project file.");
+    config.AddCommand<ListCommand>("list")
+        .WithDescription("List the runs in a project.");
     config.AddCommand<ImportCommand>("import")
         .WithDescription("Import a NONMEM run (XML or listing) into a project.");
     config.AddCommand<ImportFolderCommand>("import-folder")
