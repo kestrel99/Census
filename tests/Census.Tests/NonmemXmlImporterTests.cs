@@ -1,0 +1,230 @@
+using Census.Domain;
+using Census.Import;
+using Xunit;
+
+namespace Census.Tests;
+
+public sealed class NonmemXmlImporterTests
+{
+    private static string FixturePath(string name) =>
+        Path.Combine(AppContext.BaseDirectory, "fixtures", name);
+
+    [Fact]
+    public void CanImport_ReturnsTrueForXmlExtension()
+    {
+        Assert.True(new NonmemXmlImporter().CanImport("run27.xml"));
+        Assert.True(new NonmemXmlImporter().CanImport("RUN27.XML"));
+        Assert.False(new NonmemXmlImporter().CanImport("run27.lst"));
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsRunNo()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+
+        Assert.Equal("27", run.RunNo);
+        Assert.Equal(27, run.IRunNo);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsObsRecsAndIndividuals()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+
+        Assert.Equal(1234, run.ObsRecs);
+        Assert.Equal(56, run.Individuals);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsEstimationMethod()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+
+        var est = Assert.Single(run.Estimations);
+        Assert.Equal(1, est.Number);
+        Assert.Equal("FOCEI", est.Method);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsOfv()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+
+        var est = Assert.Single(run.Estimations);
+        Assert.Equal(-1234.567, est.Ofv!.Value, precision: 3);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsThetaParameters()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+        var params_ = run.Estimations[0].Parameters;
+
+        var thetas = params_.Where(p => p.Kind == ParameterKind.Theta).ToList();
+        Assert.Equal(2, thetas.Count);
+
+        Assert.Equal(1, thetas[0].Index);
+        Assert.Equal("CL", thetas[0].Label);
+        Assert.Equal(3.21, thetas[0].Estimate!.Value, precision: 3);
+        Assert.Equal(0.05, thetas[0].StandardError!.Value, precision: 3);
+
+        Assert.Equal(2, thetas[1].Index);
+        Assert.Equal("V", thetas[1].Label);
+        Assert.Equal(15.4, thetas[1].Estimate!.Value, precision: 3);
+        Assert.Equal(0.80, thetas[1].StandardError!.Value, precision: 3);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsOmegaWithShrinkage()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+        var omega = Assert.Single(run.Estimations[0].Parameters, p => p.Kind == ParameterKind.Omega);
+
+        Assert.Equal(1, omega.Index);
+        Assert.Equal(0.09, omega.Estimate!.Value, precision: 3);
+        Assert.Equal(0.01, omega.StandardError!.Value, precision: 3);
+        Assert.Equal(12.3, omega.Shrinkage!.Value, precision: 2);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsSigmaWithShrinkage()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+        var sigma = Assert.Single(run.Estimations[0].Parameters, p => p.Kind == ParameterKind.Sigma);
+
+        Assert.Equal(1, sigma.Index);
+        Assert.Equal(0.04, sigma.Estimate!.Value, precision: 3);
+        Assert.Equal(0.005, sigma.StandardError!.Value, precision: 3);
+        Assert.Equal(5.6, sigma.Shrinkage!.Value, precision: 2);
+    }
+
+    [Fact]
+    public void Import_Fixture_ExtractsConditionNumber()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+        var est = run.Estimations[0];
+
+        Assert.Equal(20.0, est.ConditionNumber!.Value, precision: 2); // 30.0 / 1.5
+    }
+
+    [Fact]
+    public void Import_Fixture_NoWarningsOnSuccess()
+    {
+        var run = new NonmemXmlImporter().Import(FixturePath("run27.xml"));
+        Assert.Empty(run.Estimations[0].Warnings);
+    }
+
+    [Fact]
+    public void Import_Fixture_AddsXmlFileArtifactWithMd5()
+    {
+        var path = FixturePath("run27.xml");
+        var run = new NonmemXmlImporter().Import(path);
+
+        var artifact = Assert.Single(run.Files);
+        Assert.Equal("output", artifact.Role);
+        Assert.Equal(path, artifact.Path);
+        Assert.NotNull(artifact.Md5);
+        Assert.Equal(32, artifact.Md5!.Length); // hex MD5 is 32 chars
+    }
+
+    [Fact]
+    public void Import_InlineXml_CapturesTerminationWarning()
+    {
+        var xml = """
+            <?xml version="1.0"?>
+            <output>
+              <start_datetime>2024-01-15T10:30:00</start_datetime>
+              <control_stream></control_stream>
+              <nmtran></nmtran>
+              <nonmem version="7.4.4">
+                <license_information></license_information>
+                <program_information></program_information>
+                <problem number="1" subproblem="0" superproblem1="0" iteration1="0" superproblem2="0" iteration2="0">
+                  <problem_title></problem_title>
+                  <problem_information></problem_information>
+                  <estimation number="1" type="1">
+                    <estimation_method>FOCEI</estimation_method>
+                    <termination_status>1</termination_status>
+                    <termination_information>MINIMIZATION TERMINATED</termination_information>
+                    <final_objective_function>-500.0</final_objective_function>
+                  </estimation>
+                </problem>
+              </nonmem>
+              <stop_datetime>2024-01-15T10:35:00</stop_datetime>
+            </output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "run5.xml");
+        var est = Assert.Single(run.Estimations);
+        Assert.Equal("MINIMIZATION TERMINATED", Assert.Single(est.Warnings));
+    }
+
+    [Fact]
+    public void Import_InlineXml_LegacyEtashrinkFallback()
+    {
+        // NONMEM 7.2-era files use "etashrink"/"epsshrink" instead of "etashrinksd"/"epsshrinksd".
+        var xml = """
+            <?xml version="1.0"?>
+            <output>
+              <start_datetime>2024-01-15T10:30:00</start_datetime>
+              <control_stream></control_stream>
+              <nmtran></nmtran>
+              <nonmem version="7.2.0">
+                <license_information></license_information>
+                <program_information></program_information>
+                <problem number="1" subproblem="0" superproblem1="0" iteration1="0" superproblem2="0" iteration2="0">
+                  <problem_title></problem_title>
+                  <problem_information></problem_information>
+                  <estimation number="1" type="1">
+                    <estimation_method>FOCE</estimation_method>
+                    <termination_status>0</termination_status>
+                    <etashrink>
+                      <row rname="ETA(1)">
+                        <col cname="ETA(1)">8.5</col>
+                      </row>
+                    </etashrink>
+                    <final_objective_function>-800.0</final_objective_function>
+                    <omega>
+                      <row rname="ETA(1)">
+                        <col cname="ETA(1)">0.05</col>
+                      </row>
+                    </omega>
+                  </estimation>
+                </problem>
+              </nonmem>
+              <stop_datetime>2024-01-15T10:35:00</stop_datetime>
+            </output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "run3.xml");
+        var omega = Assert.Single(run.Estimations[0].Parameters, p => p.Kind == ParameterKind.Omega);
+        Assert.Equal(8.5, omega.Shrinkage!.Value, precision: 2);
+    }
+
+    [Fact]
+    public void Import_InlineXml_SimulationRunHasNoEstimations()
+    {
+        var xml = """
+            <?xml version="1.0"?>
+            <output>
+              <start_datetime>2024-01-15T10:30:00</start_datetime>
+              <control_stream></control_stream>
+              <nmtran></nmtran>
+              <nonmem version="7.4.4">
+                <license_information></license_information>
+                <program_information></program_information>
+                <problem number="1" subproblem="0" superproblem1="0" iteration1="0" superproblem2="0" iteration2="0">
+                  <problem_title></problem_title>
+                  <problem_information></problem_information>
+                  <simulation_information>SIMULATION</simulation_information>
+                </problem>
+              </nonmem>
+              <stop_datetime>2024-01-15T10:35:00</stop_datetime>
+            </output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "sim1.xml");
+        Assert.Empty(run.Estimations);
+        Assert.Equal("1", run.RunNo);
+    }
+}

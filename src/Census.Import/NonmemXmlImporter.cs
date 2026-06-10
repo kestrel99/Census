@@ -1,17 +1,258 @@
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Xml.Linq;
 using Census.Domain;
 
 namespace Census.Import;
 
 /// <summary>
-/// Imports NONMEM 7.2+ XML output. The modern import path and the first to be implemented.
-/// Replaces the generated <c>nmoutput.pas</c> bindings with schema-aware traversal into
-/// typed domain objects.
+/// Imports NONMEM 7.2+ XML output files into <see cref="Run"/> domain objects.
+/// Parses by local element/attribute name so it is robust to the nm: namespace prefix
+/// used in real NONMEM 7.3+ output and to bare-name older output.
 /// </summary>
 public sealed class NonmemXmlImporter : IRunImporter
 {
     public bool CanImport(string sourcePath) =>
         sourcePath.EndsWith(".xml", StringComparison.OrdinalIgnoreCase);
 
-    public Run Import(string sourcePath) =>
-        throw new NotImplementedException("NONMEM XML import — phase 3.");
+    public Run Import(string sourcePath)
+    {
+        var xml = File.ReadAllText(sourcePath);
+        var run = ImportXml(xml, sourcePath);
+        var md5 = ComputeMd5(sourcePath);
+        return run with
+        {
+            Files = [new FileArtifact { Role = "output", Path = sourcePath, Md5 = md5 }],
+        };
+    }
+
+    /// <summary>Parse from an XML string. Exposed for testing without disk I/O.</summary>
+    public Run ImportXml(string xml, string sourcePath)
+    {
+        var doc = XDocument.Parse(xml);
+        var root = doc.Root!;
+
+        var nonmem = El(root, "nonmem");
+        var firstProblem = nonmem is not null ? El(nonmem, "problem") : null;
+
+        var obsRecs = ParseInt(Attr(El(firstProblem, "problem_options"), "data_nobs"));
+        var individuals = ParseInt(Attr(El(firstProblem, "problem_options"), "data_nind"));
+
+        var estimations = firstProblem is not null
+            ? ParseEstimations(firstProblem)
+            : [];
+
+        var runNo = DeriveRunNo(sourcePath);
+
+        return new Run
+        {
+            RunNo = runNo,
+            IRunNo = int.TryParse(runNo, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n) ? n : 0,
+            ObsRecs = obsRecs,
+            Individuals = individuals,
+            Estimations = estimations,
+            Files = [],
+        };
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+
+    private static List<Estimation> ParseEstimations(XElement problem)
+    {
+        var result = new List<Estimation>();
+
+        // Both "estimation" and "sir_estimation" (NONMEM 7.6+) follow the same sub-structure.
+        foreach (var estEl in problem.Elements()
+            .Where(e => e.Name.LocalName is "estimation" or "sir_estimation"))
+        {
+            var number = ParseInt(Attr(estEl, "number")) ?? 0;
+            var method = El(estEl, "estimation_method")?.Value?.Trim();
+            var ofv = ParseDouble(El(estEl, "final_objective_function")?.Value);
+            var conditionNumber = ParseConditionNumber(El(estEl, "covariance_status"));
+
+            // Shrinkage: prefer etashrinksd (7.3+, SD-based) over etashrink (7.2 legacy).
+            var etaShrinkEl = El(estEl, "etashrinksd") ?? El(estEl, "etashrink");
+            var epsShrinkEl = El(estEl, "epsshrinksd") ?? El(estEl, "epsshrink");
+
+            var thetas = ParseThetas(El(estEl, "theta"), El(estEl, "thetase"));
+            var omegas = ParseMatrix(ParameterKind.Omega, El(estEl, "omega"), El(estEl, "omegase"), etaShrinkEl);
+            var sigmas = ParseMatrix(ParameterKind.Sigma, El(estEl, "sigma"), El(estEl, "sigmase"), epsShrinkEl);
+
+            var warnings = ParseWarnings(
+                El(estEl, "termination_status"),
+                El(estEl, "termination_information"));
+
+            result.Add(new Estimation
+            {
+                Number = number,
+                Method = method,
+                Ofv = ofv,
+                ConditionNumber = conditionNumber,
+                Parameters = [.. thetas, .. omegas, .. sigmas],
+                Warnings = warnings,
+            });
+        }
+
+        return result;
+    }
+
+    private static List<Parameter> ParseThetas(XElement? thetaEl, XElement? thetaseEl)
+    {
+        if (thetaEl is null)
+        {
+            return [];
+        }
+
+        var estimates = Els(thetaEl, "val").ToList();
+        var ses = thetaseEl is not null ? Els(thetaseEl, "val").ToList() : [];
+
+        var result = new List<Parameter>(estimates.Count);
+        for (var i = 0; i < estimates.Count; i++)
+        {
+            result.Add(new Parameter
+            {
+                Kind = ParameterKind.Theta,
+                Index = i + 1,
+                Label = Attr(estimates[i], "name")?.Trim(),
+                Estimate = ParseDouble(estimates[i].Value),
+                StandardError = i < ses.Count ? ParseDouble(ses[i].Value) : null,
+            });
+        }
+
+        return result;
+    }
+
+    private static List<Parameter> ParseMatrix(
+        ParameterKind kind,
+        XElement? matEl,
+        XElement? seEl,
+        XElement? shrinkEl)
+    {
+        if (matEl is null)
+        {
+            return [];
+        }
+
+        // Lower-triangular matrix: row i has i cols; diagonal = last col of each row.
+        var rows = Els(matEl, "row").ToList();
+        var seRows = seEl is not null ? Els(seEl, "row").ToList() : [];
+        var shrinkRows = shrinkEl is not null ? Els(shrinkEl, "row").ToList() : [];
+
+        var result = new List<Parameter>(rows.Count);
+        for (var i = 0; i < rows.Count; i++)
+        {
+            var diagonalCol = Els(rows[i], "col").LastOrDefault();
+            var diagonalSe = i < seRows.Count
+                ? Els(seRows[i], "col").LastOrDefault()
+                : null;
+            // Shrinkage tables have one value per row (one per eta/eps).
+            var shrinkCol = i < shrinkRows.Count
+                ? Els(shrinkRows[i], "col").FirstOrDefault()
+                : null;
+
+            result.Add(new Parameter
+            {
+                Kind = kind,
+                Index = i + 1,
+                Label = Attr(rows[i], "rname")?.Trim(),
+                Estimate = diagonalCol is not null ? ParseDouble(diagonalCol.Value) : null,
+                StandardError = diagonalSe is not null ? ParseDouble(diagonalSe.Value) : null,
+                Shrinkage = shrinkCol is not null ? ParseDouble(shrinkCol.Value) : null,
+            });
+        }
+
+        return result;
+    }
+
+    private static double? ParseConditionNumber(XElement? covStatusEl)
+    {
+        if (covStatusEl is null)
+        {
+            return null;
+        }
+
+        var minVal = ParseDouble(Attr(covStatusEl, "mineigenvalue"));
+        var maxVal = ParseDouble(Attr(covStatusEl, "maxeigenvalue"));
+
+        if (minVal is null || maxVal is null || minVal == 0.0)
+        {
+            return null;
+        }
+
+        return maxVal / minVal;
+    }
+
+    private static List<string> ParseWarnings(XElement? statusEl, XElement? infoEl)
+    {
+        if (statusEl is null)
+        {
+            return [];
+        }
+
+        if (!int.TryParse(statusEl.Value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var status) ||
+            status == 0)
+        {
+            return [];
+        }
+
+        var text = infoEl?.Value?.Trim();
+        return string.IsNullOrEmpty(text) ? [] : [text];
+    }
+
+    private static string DeriveRunNo(string sourcePath)
+    {
+        var stem = Path.GetFileNameWithoutExtension(sourcePath);
+
+        // Extract trailing digits. Works for "run27", "sim1", "1", etc.
+        var i = stem.Length - 1;
+        while (i >= 0 && char.IsDigit(stem[i]))
+        {
+            i--;
+        }
+
+        // If we found digits, return them; otherwise return the whole stem.
+        return i < stem.Length - 1 ? stem[(i + 1)..] : stem;
+    }
+
+    private static string ComputeMd5(string filePath)
+    {
+        var bytes = File.ReadAllBytes(filePath);
+        var hash = MD5.HashData(bytes);
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    // Select by local name — transparent to nm: prefix used in real NONMEM output.
+    private static XElement? El(XContainer? parent, string localName) =>
+        parent?.Elements().FirstOrDefault(e => e.Name.LocalName == localName);
+
+    private static IEnumerable<XElement> Els(XContainer parent, string localName) =>
+        parent.Elements().Where(e => e.Name.LocalName == localName);
+
+    // Attribute lookup by local name (real NONMEM uses nm:name="..." on attributes too).
+    private static string? Attr(XElement? el, string localName) =>
+        el?.Attributes().FirstOrDefault(a => a.Name.LocalName == localName)?.Value;
+
+    private static double? ParseDouble(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return double.TryParse(value.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var d)
+            ? d
+            : null;
+    }
+
+    private static int? ParseInt(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
+            ? i
+            : null;
+    }
 }

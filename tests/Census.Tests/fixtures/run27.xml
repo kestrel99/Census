@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ASCII"?>
+<nm:output xmlns:nm="http://namespaces.oreilly.com/xmlnut/address">
+  <nm:start_datetime>2024-01-15T10:30:00</nm:start_datetime>
+  <nm:control_stream>$PROB run27</nm:control_stream>
+  <nm:nmtran>SUCCESSFUL</nm:nmtran>
+  <nm:nonmem nm:version="7.6.0">
+    <nm:license_information>NONMEM 7.6.0</nm:license_information>
+    <nm:program_information>ICON plc</nm:program_information>
+    <nm:problem nm:number="1" nm:subproblem="0" nm:superproblem1="0" nm:iteration1="0" nm:superproblem2="0" nm:iteration2="0">
+      <nm:problem_title>$PROBLEM run27</nm:problem_title>
+      <nm:problem_information>NONMEM run 27</nm:problem_information>
+      <nm:problem_options nm:data_nobs="1234" nm:data_nind="56"/>
+      <nm:estimation nm:number="1" nm:type="1">
+        <nm:estimation_method>FOCEI</nm:estimation_method>
+        <nm:termination_status>0</nm:termination_status>
+        <nm:termination_information>MINIMIZATION SUCCESSFUL</nm:termination_information>
+        <nm:etashrinksd nm:number="1">
+          <nm:row nm:rname="ETA(1)">
+            <nm:col nm:cname="ETA(1)">12.3</nm:col>
+          </nm:row>
+        </nm:etashrinksd>
+        <nm:epsshrinksd nm:number="1">
+          <nm:row nm:rname="EPS(1)">
+            <nm:col nm:cname="EPS(1)">5.6</nm:col>
+          </nm:row>
+        </nm:epsshrinksd>
+        <nm:final_objective_function>-1234.567</nm:final_objective_function>
+        <nm:theta nm:number="1">
+          <nm:val nm:name="CL">3.21</nm:val>
+          <nm:val nm:name="V">15.4</nm:val>
+        </nm:theta>
+        <nm:omega nm:number="1">
+          <nm:row nm:rname="ETA(1)">
+            <nm:col nm:cname="ETA(1)">0.09</nm:col>
+          </nm:row>
+        </nm:omega>
+        <nm:sigma nm:number="1">
+          <nm:row nm:rname="EPS(1)">
+            <nm:col nm:cname="EPS(1)">0.04</nm:col>
+          </nm:row>
+        </nm:sigma>
+        <nm:thetase nm:number="1">
+          <nm:val nm:name="CL">0.05</nm:val>
+          <nm:val nm:name="V">0.80</nm:val>
+        </nm:thetase>
+        <nm:omegase nm:number="1">
+          <nm:row nm:rname="ETA(1)">
+            <nm:col nm:cname="ETA(1)">0.01</nm:col>
+          </nm:row>
+        </nm:omegase>
+        <nm:sigmase nm:number="1">
+          <nm:row nm:rname="EPS(1)">
+            <nm:col nm:cname="EPS(1)">0.005</nm:col>
+          </nm:row>
+        </nm:sigmase>
+        <nm:eigenvalues nm:number="1">
+          <nm:val nm:name="1">1.5</nm:val>
+          <nm:val nm:name="2">30.0</nm:val>
+        </nm:eigenvalues>
+        <nm:covariance_status nm:error="0" nm:numnegeigenvalues="0" nm:mineigenvalue="1.5" nm:maxeigenvalue="30.0" nm:rms="0.01"/>
+      </nm:estimation>
+    </nm:problem>
+  </nm:nonmem>
+  <nm:stop_datetime>2024-01-15T10:35:00</nm:stop_datetime>
+  <nm:total_cputime>12.34</nm:total_cputime>
+</nm:output>
