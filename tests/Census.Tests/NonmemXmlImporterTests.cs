@@ -227,4 +227,61 @@ public sealed class NonmemXmlImporterTests
         Assert.Empty(run.Estimations);
         Assert.Equal("1", run.RunNo);
     }
+
+    [Fact]
+    public void Import_InlineXml_FlatShrinkageRowFormat()
+    {
+        // NM 7.3–7.5 write shrinkage as one SUBPOP row with one col per eta,
+        // not one row per eta. Both etas must get their shrinkage values.
+        var xml = """
+            <?xml version="1.0" encoding="ASCII"?>
+            <nm:output xmlns:nm="http://namespaces.oreilly.com/xmlnut/address">
+              <nm:nonmem nm:version='7.3.0'>
+                <nm:problem nm:number='1'>
+                  <nm:estimation nm:number='1' nm:type='0'>
+                    <nm:estimation_method>focei</nm:estimation_method>
+                    <nm:termination_status>0</nm:termination_status>
+                    <nm:etashrink>
+                      <nm:row nm:rname='SUBPOP1'>
+                        <nm:col nm:cname='ETA1'>1.37</nm:col>
+                        <nm:col nm:cname='ETA2'>1.46</nm:col>
+                      </nm:row>
+                    </nm:etashrink>
+                    <nm:epsshrink>
+                      <nm:row nm:rname='SUBPOP1'>
+                        <nm:col nm:cname='EPS1'>5.22</nm:col>
+                      </nm:row>
+                    </nm:epsshrink>
+                    <nm:final_objective_function>-4126.11</nm:final_objective_function>
+                    <nm:omega>
+                      <nm:row nm:rname='1'>
+                        <nm:col nm:cname='1'>0.0716</nm:col>
+                      </nm:row>
+                      <nm:row nm:rname='2'>
+                        <nm:col nm:cname='1'>0.0</nm:col>
+                        <nm:col nm:cname='2'>0.0922</nm:col>
+                      </nm:row>
+                    </nm:omega>
+                    <nm:sigma>
+                      <nm:row nm:rname='1'>
+                        <nm:col nm:cname='1'>1.0</nm:col>
+                      </nm:row>
+                    </nm:sigma>
+                  </nm:estimation>
+                </nm:problem>
+              </nm:nonmem>
+            </nm:output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR001.xml");
+        var est = Assert.Single(run.Estimations);
+
+        var omegas = est.Parameters.Where(p => p.Kind == ParameterKind.Omega).ToList();
+        Assert.Equal(2, omegas.Count);
+        Assert.Equal(1.37, omegas[0].Shrinkage!.Value, precision: 2);
+        Assert.Equal(1.46, omegas[1].Shrinkage!.Value, precision: 2);
+
+        var sigma = Assert.Single(est.Parameters, p => p.Kind == ParameterKind.Sigma);
+        Assert.Equal(5.22, sigma.Shrinkage!.Value, precision: 2);
+    }
 }

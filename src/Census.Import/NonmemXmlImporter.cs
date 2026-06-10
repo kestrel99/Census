@@ -136,7 +136,7 @@ public sealed class NonmemXmlImporter : IRunImporter
         // Lower-triangular matrix: row i has i cols; diagonal = last col of each row.
         var rows = Els(matEl, "row").ToList();
         var seRows = seEl is not null ? Els(seEl, "row").ToList() : [];
-        var shrinkRows = shrinkEl is not null ? Els(shrinkEl, "row").ToList() : [];
+        var shrinkValues = FlattenShrinkageValues(shrinkEl);
 
         var result = new List<Parameter>(rows.Count);
         for (var i = 0; i < rows.Count; i++)
@@ -144,10 +144,6 @@ public sealed class NonmemXmlImporter : IRunImporter
             var diagonalCol = Els(rows[i], "col").LastOrDefault();
             var diagonalSe = i < seRows.Count
                 ? Els(seRows[i], "col").LastOrDefault()
-                : null;
-            // Shrinkage tables have one value per row (one per eta/eps).
-            var shrinkCol = i < shrinkRows.Count
-                ? Els(shrinkRows[i], "col").FirstOrDefault()
                 : null;
 
             result.Add(new Parameter
@@ -157,11 +153,28 @@ public sealed class NonmemXmlImporter : IRunImporter
                 Label = Attr(rows[i], "rname")?.Trim(),
                 Estimate = diagonalCol is not null ? ParseDouble(diagonalCol.Value) : null,
                 StandardError = diagonalSe is not null ? ParseDouble(diagonalSe.Value) : null,
-                Shrinkage = shrinkCol is not null ? ParseDouble(shrinkCol.Value) : null,
+                Shrinkage = i < shrinkValues.Count ? shrinkValues[i] : null,
             });
         }
 
         return result;
+    }
+
+    // Shrinkage tables come in two layouts:
+    //   Flat (7.3–7.5): one row per subpopulation, one col per eta/eps.
+    //   Per-parameter (fixture / 7.6+): one row per eta/eps, one col per row.
+    // Both produce the same indexed list of values.
+    private static List<double?> FlattenShrinkageValues(XElement? shrinkEl)
+    {
+        if (shrinkEl is null) return [];
+        var rows = Els(shrinkEl, "row").ToList();
+        if (rows.Count == 0) return [];
+
+        var firstRowCols = Els(rows[0], "col").ToList();
+        if (rows.Count == 1 && firstRowCols.Count > 1)
+            return firstRowCols.Select(c => ParseDouble(c.Value)).ToList();
+
+        return rows.Select(r => ParseDouble(Els(r, "col").FirstOrDefault()?.Value)).ToList();
     }
 
     private static double? ParseConditionNumber(XElement? covStatusEl)
