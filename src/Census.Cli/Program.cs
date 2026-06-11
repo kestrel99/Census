@@ -14,7 +14,7 @@ app.Configure(config =>
     config.AddCommand<ImportFolderCommand>("import-folder")
         .WithDescription("Discover and import all runs under a folder.");
     config.AddCommand<ExportRunCommand>("export-run")
-        .WithDescription("Export a run report (csv, html, latex).");
+        .WithDescription("Export a run report (default: html; also csv, latex).");
     config.AddCommand<CompareCommand>("compare")
         .WithDescription("Compare runs in a project.");
     config.AddCommand<ArchiveCommand>("archive")
