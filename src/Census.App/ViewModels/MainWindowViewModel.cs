@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using Avalonia.Controls.ApplicationLifetimes;
 using Census.App.Services;
+using Census.App.Views;
 using Census.Archive;
 using Census.Domain;
 using Census.Import;
@@ -22,6 +24,7 @@ public partial class MainWindowViewModel : ObservableObject
         _store = store;
         _dialogs = dialogs;
         _settings = settings;
+        RefreshRecentProjects();
     }
 
     [ObservableProperty]
@@ -30,6 +33,9 @@ public partial class MainWindowViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ImportRunCommand))]
     [NotifyCanExecuteChangedFor(nameof(ImportFolderCommand))]
     private string? _projectPath;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _recentProjects = [];
 
     [ObservableProperty]
     private ObservableCollection<RunSummaryViewModel> _runs = [];
@@ -70,6 +76,7 @@ public partial class MainWindowViewModel : ObservableObject
         ProjectPath = path;
         Runs.Clear();
         _settings.AddRecentProject(path);
+        RefreshRecentProjects();
         UpdateStatusText($"0 runs | {Path.GetFileName(path)}");
     }
 
@@ -162,6 +169,33 @@ public partial class MainWindowViewModel : ObservableObject
         UpdateStatusText($"Archived {SelectedRun.RunNo} to {Path.GetFileName(path)}.");
     }
 
+    [RelayCommand]
+    private async Task OpenRecentProjectAsync(string path)
+    {
+        if (!File.Exists(path))
+        {
+            UpdateStatusText($"Project not found: {Path.GetFileName(path)}");
+            return;
+        }
+        LoadProject(path);
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task OpenSettingsAsync()
+    {
+        var vm = new SettingsViewModel(_settings);
+        var win = new SettingsWindow { DataContext = vm };
+        var owner = (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (owner is not null)
+            await win.ShowDialog(owner);
+    }
+
+    private void RefreshRecentProjects()
+    {
+        RecentProjects = new ObservableCollection<string>(_settings.GetRecentProjects());
+    }
+
     private void LoadProject(string path)
     {
         try
@@ -170,6 +204,7 @@ public partial class MainWindowViewModel : ObservableObject
             ProjectPath = path;
             RefreshRuns();
             _settings.AddRecentProject(path);
+            RefreshRecentProjects();
         }
         catch (Exception ex)
         {

@@ -38,6 +38,12 @@ public sealed class JsonSettingsService : ISettingsService
         catch { /* ignore save failures */ }
     }
 
+    public void UpdateSettings(Action<AppSettings> mutate)
+    {
+        mutate(_cache);
+        Save(_cache);
+    }
+
     public void AddRecentProject(string path)
     {
         _cache.RecentProjects.Remove(path);
