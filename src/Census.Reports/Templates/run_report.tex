@@ -1,0 +1,30 @@
+\documentclass[12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{longtable}
+\usepackage{booktabs}
+\begin{document}
+
+\section*{Run {{ run_no }}}
+{{ if obs_recs }}Observations: {{ obs_recs }}{{ if individuals }}, Individuals: {{ individuals }}{{ end }}\\{{ end }}
+
+{{ for est in estimations }}
+\subsection*{Estimation {{ est.number }}{{ if est.method }} ({{ est.method }}){{ end }}}
+{{ if est.ofv }}OFV: {{ est.ofv }}{{ if est.condition_number }}, Condition number: {{ est.condition_number }}{{ end }}\\{{ end }}
+
+{{ if est.warnings }}
+\begin{itemize}
+{{ for w in est.warnings }}\item {{ w }}
+{{ end }}\end{itemize}
+{{ end }}
+
+\begin{longtable}{llrrrrl}
+\toprule
+No. & Parameter & Estimate & S.E. & \%RSE & 95\% CI & Shrinkage (\%) \\
+\midrule
+\endhead
+{{ for p in est.parameters }}{{ p.kind }}{{ p.index }} & {{ p.label }} & {{ p.estimate }} & {{ p.se }} & {{ p.rse }} & {{ if p.ci_lower != "" }}{{ p.ci_lower }}--{{ p.ci_upper }}{{ end }} & {{ p.shrinkage }} \\
+{{ end }}\bottomrule
+\end{longtable}
+
+{{ end }}
+\end{document}
