@@ -33,6 +33,14 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private RunSummaryViewModel? _selectedRun;
 
+    [ObservableProperty]
+    private RunDetailViewModel? _runDetail;
+
+    partial void OnSelectedRunChanged(RunSummaryViewModel? value)
+    {
+        RunDetail = value is not null ? new RunDetailViewModel(value.Model) : null;
+    }
+
     public bool IsProjectOpen => ProjectPath is not null;
     public string Title => ProjectPath is not null
         ? $"Census — {Path.GetFileName(ProjectPath)}"

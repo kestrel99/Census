@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Census.App.ViewModels"
+             x:Class="Census.App.Views.RunDetailView"
+             x:DataType="vm:RunDetailViewModel">
+
+  <TabControl>
+
+    <!-- Summary tab -->
+    <TabItem Header="Summary">
+      <ScrollViewer>
+        <StackPanel Margin="8" Spacing="4">
+          <TextBlock><Run Text="Run: "/><Run Text="{Binding RunNo}" FontWeight="Bold"/></TextBlock>
+          <TextBlock><Run Text="Method: "/><Run Text="{Binding Method}"/></TextBlock>
+          <TextBlock><Run Text="OFV: "/><Run Text="{Binding Ofv}"/></TextBlock>
+          <TextBlock IsVisible="{Binding ConditionNumber, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <Run Text="Condition number: "/><Run Text="{Binding ConditionNumber}"/>
+          </TextBlock>
+          <TextBlock IsVisible="{Binding ObsRecs, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <Run Text="Observations: "/><Run Text="{Binding ObsRecs}"/>
+            <Run Text="  Individuals: "/><Run Text="{Binding Individuals}"/>
+          </TextBlock>
+          <ItemsControl IsVisible="{Binding HasWarnings}" ItemsSource="{Binding Warnings}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" Foreground="OrangeRed" FontStyle="Italic" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+
+    <!-- Parameters tab (all) -->
+    <TabItem Header="Parameters">
+      <DataGrid ItemsSource="{Binding AllParameters}"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal"
+                AutoGenerateColumns="False">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Type"      Binding="{Binding Kind}"     Width="60"  />
+          <DataGridTextColumn Header="No."       Binding="{Binding Index}"    Width="40"  />
+          <DataGridTextColumn Header="Label"     Binding="{Binding Label}"    Width="80"  />
+          <DataGridTextColumn Header="Estimate"  Binding="{Binding Estimate}" Width="100" />
+          <DataGridTextColumn Header="S.E."      Binding="{Binding Se}"       Width="90"  />
+          <DataGridTextColumn Header="%RSE"      Binding="{Binding Rse}"      Width="70"  />
+          <DataGridTextColumn Header="95% CI"    Binding="{Binding Ci}"       Width="160" />
+          <DataGridTextColumn Header="Shrinkage" Binding="{Binding Shrinkage}" Width="90" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </TabItem>
+
+    <!-- Theta tab -->
+    <TabItem Header="Theta" IsVisible="{Binding HasThetas}">
+      <DataGrid ItemsSource="{Binding Thetas}"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal"
+                AutoGenerateColumns="False">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="&#952;"      Binding="{Binding Index}"    Width="40"  />
+          <DataGridTextColumn Header="Label"    Binding="{Binding Label}"    Width="80"  />
+          <DataGridTextColumn Header="Estimate" Binding="{Binding Estimate}" Width="100" />
+          <DataGridTextColumn Header="S.E."     Binding="{Binding Se}"       Width="90"  />
+          <DataGridTextColumn Header="%RSE"     Binding="{Binding Rse}"      Width="70"  />
+          <DataGridTextColumn Header="95% CI"   Binding="{Binding Ci}"       Width="160" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </TabItem>
+
+    <!-- Omega tab -->
+    <TabItem Header="Omega" IsVisible="{Binding HasOmegas}">
+      <DataGrid ItemsSource="{Binding Omegas}"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal"
+                AutoGenerateColumns="False">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="&#969;&#178;"   Binding="{Binding Index}"    Width="40"  />
+          <DataGridTextColumn Header="Label"     Binding="{Binding Label}"    Width="80"  />
+          <DataGridTextColumn Header="Estimate"  Binding="{Binding Estimate}" Width="100" />
+          <DataGridTextColumn Header="S.E."      Binding="{Binding Se}"       Width="90"  />
+          <DataGridTextColumn Header="%RSE"      Binding="{Binding Rse}"      Width="70"  />
+          <DataGridTextColumn Header="95% CI"    Binding="{Binding Ci}"       Width="160" />
+          <DataGridTextColumn Header="Shrinkage" Binding="{Binding Shrinkage}" Width="90" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </TabItem>
+
+    <!-- Sigma tab -->
+    <TabItem Header="Sigma" IsVisible="{Binding HasSigmas}">
+      <DataGrid ItemsSource="{Binding Sigmas}"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal"
+                AutoGenerateColumns="False">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="&#963;&#178;"   Binding="{Binding Index}"    Width="40"  />
+          <DataGridTextColumn Header="Label"     Binding="{Binding Label}"    Width="80"  />
+          <DataGridTextColumn Header="Estimate"  Binding="{Binding Estimate}" Width="100" />
+          <DataGridTextColumn Header="S.E."      Binding="{Binding Se}"       Width="90"  />
+          <DataGridTextColumn Header="%RSE"      Binding="{Binding Rse}"      Width="70"  />
+          <DataGridTextColumn Header="95% CI"    Binding="{Binding Ci}"       Width="160" />
+          <DataGridTextColumn Header="Shrinkage" Binding="{Binding Shrinkage}" Width="90" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </TabItem>
+
+  </TabControl>
+
+</UserControl>

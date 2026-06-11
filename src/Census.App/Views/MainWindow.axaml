@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Census.App.ViewModels"
+        xmlns:views="using:Census.App.Views"
         x:Class="Census.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Width="1100" Height="700" MinWidth="800" MinHeight="500"
@@ -46,28 +47,46 @@
                  FontSize="11" Foreground="{DynamicResource SystemBaseMediumColor}" />
     </Border>
 
-    <!-- Main content: run DataGrid -->
-    <DataGrid ItemsSource="{Binding Runs}"
-              SelectedItem="{Binding SelectedRun}"
-              IsReadOnly="True"
-              GridLinesVisibility="Horizontal"
-              CanUserReorderColumns="True"
-              CanUserResizeColumns="True"
-              AutoGenerateColumns="False"
-              Margin="0">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="Run"     Binding="{Binding RunNo}"           Width="60" />
-        <DataGridTextColumn Header="Parent"  Binding="{Binding ParentNo}"        Width="60" />
-        <DataGridTextColumn Header="Method"  Binding="{Binding Method}"          Width="80" />
-        <DataGridTextColumn Header="OFV"     Binding="{Binding Ofv}"             Width="100" />
-        <DataGridTextColumn Header="dOFV"    Binding="{Binding DOfv}"            Width="90" />
-        <DataGridTextColumn Header="Cond#"   Binding="{Binding ConditionNumber}" Width="80" />
-        <DataGridTextColumn Header="Obs"     Binding="{Binding ObsRecs}"         Width="60" />
-        <DataGridTextColumn Header="Ind"     Binding="{Binding Individuals}"     Width="50" />
-        <DataGridCheckBoxColumn Header="Key" Binding="{Binding KeyRun}"          Width="40" />
-        <DataGridTextColumn Header="Warn"    Binding="{Binding Warnings}"        Width="50" />
-      </DataGrid.Columns>
-    </DataGrid>
+    <!-- Main content split: run list (top) + detail (bottom) -->
+    <Grid RowDefinitions="3*,4,2*">
+
+      <!-- Run DataGrid -->
+      <DataGrid Grid.Row="0"
+                ItemsSource="{Binding Runs}"
+                SelectedItem="{Binding SelectedRun}"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal"
+                CanUserReorderColumns="True"
+                CanUserResizeColumns="True"
+                AutoGenerateColumns="False">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Run"     Binding="{Binding RunNo}"           Width="60"  />
+          <DataGridTextColumn Header="Parent"  Binding="{Binding ParentNo}"        Width="60"  />
+          <DataGridTextColumn Header="Method"  Binding="{Binding Method}"          Width="80"  />
+          <DataGridTextColumn Header="OFV"     Binding="{Binding Ofv}"             Width="100" />
+          <DataGridTextColumn Header="dOFV"    Binding="{Binding DOfv}"            Width="90"  />
+          <DataGridTextColumn Header="Cond#"   Binding="{Binding ConditionNumber}" Width="80"  />
+          <DataGridTextColumn Header="Obs"     Binding="{Binding ObsRecs}"         Width="60"  />
+          <DataGridTextColumn Header="Ind"     Binding="{Binding Individuals}"     Width="50"  />
+          <DataGridCheckBoxColumn Header="Key" Binding="{Binding KeyRun}"          Width="40"  />
+          <DataGridTextColumn Header="Warn"    Binding="{Binding Warnings}"        Width="50"  />
+        </DataGrid.Columns>
+      </DataGrid>
+
+      <!-- Splitter -->
+      <GridSplitter Grid.Row="1" ResizeDirection="Rows" Background="#ccc"
+                    HorizontalAlignment="Stretch" />
+
+      <!-- Run detail (visible only when a run is selected) -->
+      <ContentControl Grid.Row="2" Content="{Binding RunDetail}">
+        <ContentControl.DataTemplates>
+          <DataTemplate DataType="vm:RunDetailViewModel">
+            <views:RunDetailView />
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+      </ContentControl>
+
+    </Grid>
 
   </DockPanel>
 

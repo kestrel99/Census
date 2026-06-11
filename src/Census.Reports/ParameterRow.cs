@@ -6,7 +6,7 @@ namespace Census.Reports;
 /// <summary>
 /// Computed view model for one parameter row in a report.
 /// </summary>
-internal readonly record struct ParameterRow
+public readonly record struct ParameterRow
 {
     public string Kind { get; init; }
     public int Index { get; init; }
