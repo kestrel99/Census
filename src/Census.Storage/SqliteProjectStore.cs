@@ -215,6 +215,14 @@ public sealed class SqliteProjectStore : IProjectStore
         connection.Execute("DELETE FROM runs WHERE RunNo = @runNo;", new { runNo });
     }
 
+    public void SetKeyRun(string runNo, bool keyRun)
+    {
+        using var connection = OpenConnection();
+        connection.Execute(
+            "UPDATE runs SET KeyRun = @keyRun WHERE RunNo = @runNo;",
+            new { keyRun = keyRun ? 1 : 0, runNo });
+    }
+
     private SqliteConnection OpenConnection()
     {
         var connection = new SqliteConnection(ConnectionString);

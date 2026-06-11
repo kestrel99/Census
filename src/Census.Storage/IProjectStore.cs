@@ -23,4 +23,7 @@ public interface IProjectStore
 
     /// <summary>Delete a run (and its estimations, parameters, warnings and file refs) by run number.</summary>
     void DeleteRun(string runNo);
+
+    /// <summary>Set or clear the "key run" flag for a run.</summary>
+    void SetKeyRun(string runNo, bool keyRun);
 }

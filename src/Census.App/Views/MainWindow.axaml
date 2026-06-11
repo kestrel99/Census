@@ -174,11 +174,24 @@
                   SelectedItem="{Binding SelectedRun}"
                   SelectionMode="Extended"
                   SelectionChanged="OnRunSelectionChanged"
+                  PointerPressed="OnRunGridPointerPressed"
                   IsReadOnly="True"
                   GridLinesVisibility="Horizontal"
                   CanUserReorderColumns="True"
                   CanUserResizeColumns="True"
                   AutoGenerateColumns="False">
+          <DataGrid.ContextMenu>
+            <ContextMenu x:CompileBindings="False">
+              <MenuItem Header="Flag as key run" Command="{Binding FlagRunCommand}" />
+              <MenuItem Header="Unflag" Command="{Binding UnflagRunCommand}" />
+              <Separator />
+              <MenuItem Header="Export…" Command="{Binding ExportRunCommand}" />
+              <MenuItem Header="Archive…" Command="{Binding ArchiveRunCommand}" />
+              <Separator />
+              <MenuItem Header="Compare selected" Command="{Binding CompareCommand}" />
+              <MenuItem Header="Delete" Command="{Binding DeleteRunCommand}" />
+            </ContextMenu>
+          </DataGrid.ContextMenu>
           <DataGrid.Columns>
             <DataGridTextColumn Header="Run" Binding="{Binding RunNo}" Width="80" />
             <DataGridTemplateColumn Header="Flag" Width="44">

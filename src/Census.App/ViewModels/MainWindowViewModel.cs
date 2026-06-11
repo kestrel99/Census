@@ -168,6 +168,21 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]
+    private void FlagRun() => SetSelectedRunKeyFlag(true);
+
+    [RelayCommand(CanExecute = nameof(IsRunSelected))]
+    private void UnflagRun() => SetSelectedRunKeyFlag(false);
+
+    private void SetSelectedRunKeyFlag(bool keyRun)
+    {
+        if (SelectedRun is null) return;
+        var runNo = SelectedRun.RunNo;
+        _store.SetKeyRun(runNo, keyRun);
+        RefreshRuns();
+        SelectedRun = Runs.FirstOrDefault(r => r.RunNo == runNo);
+    }
+
+    [RelayCommand(CanExecute = nameof(IsRunSelected))]
     private void DeleteRun()
     {
         if (SelectedRun is null) return;
