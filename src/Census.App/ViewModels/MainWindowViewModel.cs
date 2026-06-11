@@ -1,6 +1,10 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using Census.App.Services;
+using Census.Archive;
 using Census.Domain;
+using Census.Import;
+using Census.Reports;
 using Census.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,15 +26,17 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Title))]
-    [NotifyPropertyChangedFor(nameof(StatusText))]
     [NotifyPropertyChangedFor(nameof(IsProjectOpen))]
+    [NotifyCanExecuteChangedFor(nameof(ImportRunCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ImportFolderCommand))]
     private string? _projectPath;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StatusText))]
     private ObservableCollection<RunSummaryViewModel> _runs = [];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ExportRunCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArchiveRunCommand))]
     private RunSummaryViewModel? _selectedRun;
 
     [ObservableProperty]
@@ -42,12 +48,18 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     public bool IsProjectOpen => ProjectPath is not null;
+    public bool IsRunSelected => SelectedRun is not null;
+
     public string Title => ProjectPath is not null
         ? $"Census — {Path.GetFileName(ProjectPath)}"
         : "Census";
-    public string StatusText => ProjectPath is not null
-        ? $"{Runs.Count} run{(Runs.Count == 1 ? "" : "s")} | {Path.GetFileName(ProjectPath)}"
-        : "No project open";
+    public string StatusText { get; private set; } = "No project open";
+
+    private void UpdateStatusText(string text)
+    {
+        StatusText = text;
+        OnPropertyChanged(nameof(StatusText));
+    }
 
     [RelayCommand]
     private async Task NewProjectAsync()
@@ -58,6 +70,7 @@ public partial class MainWindowViewModel : ObservableObject
         ProjectPath = path;
         Runs.Clear();
         _settings.AddRecentProject(path);
+        UpdateStatusText($"0 runs | {Path.GetFileName(path)}");
     }
 
     [RelayCommand]
@@ -73,6 +86,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         ProjectPath = null;
         Runs.Clear();
+        UpdateStatusText("No project open");
     }
 
     [RelayCommand]
@@ -81,6 +95,71 @@ public partial class MainWindowViewModel : ObservableObject
         if (Avalonia.Application.Current?.ApplicationLifetime is
             Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime lifetime)
             lifetime.Shutdown();
+    }
+
+    [RelayCommand(CanExecute = nameof(IsProjectOpen))]
+    private async Task ImportRunAsync()
+    {
+        var path = await _dialogs.OpenImportFileAsync();
+        if (path is null) return;
+        var run = new NonmemXmlImporter().Import(path);
+        _store.SaveRun(run);
+        RefreshRuns();
+    }
+
+    [RelayCommand(CanExecute = nameof(IsProjectOpen))]
+    private async Task ImportFolderAsync()
+    {
+        var folder = await _dialogs.OpenImportFolderAsync();
+        if (folder is null) return;
+        var importer = new NonmemXmlImporter();
+        var files = Directory.EnumerateFiles(folder, "*.xml", SearchOption.AllDirectories).ToList();
+        int imported = 0;
+        foreach (var file in files)
+        {
+            try
+            {
+                var run = importer.Import(file);
+                _store.SaveRun(run);
+                imported++;
+            }
+            catch { /* skip unparseable files */ }
+        }
+        if (imported > 0) RefreshRuns();
+        UpdateStatusText($"Imported {imported} of {files.Count} XML files.");
+    }
+
+    [RelayCommand(CanExecute = nameof(IsRunSelected))]
+    private async Task ExportRunAsync()
+    {
+        if (SelectedRun is null) return;
+        var path = await _dialogs.SaveReportAsync("csv");
+        if (path is null) return;
+        var ext = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
+        IReportWriter writer = ext switch
+        {
+            "html" => new HtmlReportWriter(),
+            "tex"  => new LatexReportWriter(),
+            _      => new CsvReportWriter(),
+        };
+        var run = _store.GetRuns().FirstOrDefault(r => r.RunNo == SelectedRun.RunNo);
+        if (run is null) return;
+        var content = writer.Render(run);
+        await File.WriteAllTextAsync(path, content);
+        UpdateStatusText($"Exported {SelectedRun.RunNo} to {Path.GetFileName(path)}.");
+    }
+
+    [RelayCommand(CanExecute = nameof(IsRunSelected))]
+    private async Task ArchiveRunAsync()
+    {
+        if (SelectedRun is null) return;
+        var path = await _dialogs.SaveArchiveAsync("zip");
+        if (path is null) return;
+        var run = _store.GetRuns().FirstOrDefault(r => r.RunNo == SelectedRun.RunNo);
+        if (run is null) return;
+        var archiver = new RunArchiver();
+        await Task.Run(() => archiver.Archive(run, path, includeData: true));
+        UpdateStatusText($"Archived {SelectedRun.RunNo} to {Path.GetFileName(path)}.");
     }
 
     private void LoadProject(string path)
@@ -94,7 +173,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // TODO: show error dialog when compare/import dialogs are implemented in Task 3
             System.Diagnostics.Debug.WriteLine($"Failed to open project: {ex.Message}");
         }
     }
@@ -106,6 +184,8 @@ public partial class MainWindowViewModel : ObservableObject
         Runs = new ObservableCollection<RunSummaryViewModel>(
             all.Select(r => new RunSummaryViewModel(r, byRunNo)));
         OnPropertyChanged(nameof(Runs));
-        OnPropertyChanged(nameof(StatusText));
+        UpdateStatusText(ProjectPath is not null
+            ? $"{Runs.Count} run{(Runs.Count == 1 ? "" : "s")} | {Path.GetFileName(ProjectPath)}"
+            : "No project open");
     }
 }

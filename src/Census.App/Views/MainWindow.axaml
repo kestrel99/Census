@@ -18,11 +18,17 @@
         <MenuItem Header="_Close Project" Command="{Binding CloseProjectCommand}"
                   IsEnabled="{Binding IsProjectOpen}" />
         <Separator />
+        <MenuItem Header="_Import Run…" Command="{Binding ImportRunCommand}" InputGesture="Ctrl+I" />
+        <MenuItem Header="Import _Folder…" Command="{Binding ImportFolderCommand}" />
+        <Separator />
+        <MenuItem Header="_Export Run…" Command="{Binding ExportRunCommand}" InputGesture="Ctrl+E" />
+        <MenuItem Header="_Archive Run…" Command="{Binding ArchiveRunCommand}" />
+        <Separator />
         <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
       </MenuItem>
       <MenuItem Header="_Runs" IsEnabled="{Binding IsProjectOpen}">
-        <MenuItem Header="_Import Run…"   />
-        <MenuItem Header="Import _Folder…" />
+        <MenuItem Header="_Import Run…" Command="{Binding ImportRunCommand}" />
+        <MenuItem Header="Import _Folder…" Command="{Binding ImportFolderCommand}" />
         <Separator />
         <MenuItem Header="_Compare Runs"  />
       </MenuItem>
@@ -37,8 +43,11 @@
       <Button Content="New"    Command="{Binding NewProjectCommand}"   Margin="4,4,0,4" />
       <Button Content="Open"   Command="{Binding OpenProjectCommand}"  Margin="0,4" />
       <Separator Width="1" Background="#ccc" Margin="4,6" />
-      <Button Content="Import" IsEnabled="{Binding IsProjectOpen}"     Margin="0,4" />
-      <Button Content="Export" IsEnabled="{Binding IsProjectOpen}"     Margin="0,4" />
+      <Button Content="Import" Command="{Binding ImportRunCommand}" ToolTip.Tip="Import XML run" Margin="0,4" />
+      <Button Content="Import Folder" Command="{Binding ImportFolderCommand}" ToolTip.Tip="Import all XML runs in folder" Margin="0,4" />
+      <Separator Width="1" Background="#ccc" Margin="4,6" />
+      <Button Content="Export" Command="{Binding ExportRunCommand}" ToolTip.Tip="Export selected run to CSV/HTML/LaTeX" Margin="0,4" />
+      <Button Content="Archive" Command="{Binding ArchiveRunCommand}" ToolTip.Tip="Archive selected run as ZIP" Margin="0,4" />
     </StackPanel>
 
     <!-- Status bar -->
