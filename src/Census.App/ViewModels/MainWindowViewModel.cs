@@ -179,8 +179,20 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(IsProjectOpen))]
-    private void Compare() =>
-        UpdateStatusText("Compare: use the run list to review runs side by side (full compare view is planned).");
+    private async Task CompareAsync()
+    {
+        var runs = _store.GetRuns();
+        if (runs.Count == 0)
+        {
+            UpdateStatusText("No runs to compare.");
+            return;
+        }
+
+        var win = new CompareWindow(new CompareViewModel(runs));
+        var owner = (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (owner is not null)
+            await win.ShowDialog(owner);
+    }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]
     private void Diagnostics() =>
