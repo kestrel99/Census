@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Census.App.ViewModels"
+             xmlns:views="using:Census.App.Views"
              x:Class="Census.App.Views.RunDetailView"
              x:DataType="vm:RunDetailViewModel">
 
@@ -95,8 +96,24 @@
       </TabItem>
 
       <TabItem Header="Matrices">
-        <TextBlock Margin="12" Foreground="#888"
-                   Text="Variance-covariance and correlation matrices are not yet available." />
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8,6" Spacing="8">
+            <TextBlock Text="Matrix:" VerticalAlignment="Center" />
+            <ComboBox Width="150" ItemsSource="{Binding MatrixKinds}" SelectedItem="{Binding MatrixKind}" />
+          </StackPanel>
+          <TextBlock DockPanel.Dock="Top" Margin="12" Foreground="#888"
+                     IsVisible="{Binding !HasMatrix}"
+                     Text="No matrix available for this estimation (no covariance step, or not imported)." />
+          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ContentControl Content="{Binding CurrentMatrix}">
+              <ContentControl.DataTemplates>
+                <DataTemplate DataType="vm:MatrixViewModel">
+                  <views:MatrixView />
+                </DataTemplate>
+              </ContentControl.DataTemplates>
+            </ContentControl>
+          </ScrollViewer>
+        </DockPanel>
       </TabItem>
 
       <TabItem Header="Miscellaneous">

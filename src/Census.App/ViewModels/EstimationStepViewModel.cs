@@ -27,6 +27,9 @@ public sealed class EstimationStepViewModel
         Omegas = ps.Where(p => p.Kind == ParameterKind.Omega).Select(p => new ParameterRowViewModel(p)).ToList();
         Sigmas = ps.Where(p => p.Kind == ParameterKind.Sigma).Select(p => new ParameterRowViewModel(p)).ToList();
         Warnings = est.Warnings;
+
+        Correlation = est.Correlation is not null ? new MatrixViewModel(est.Correlation) : null;
+        Covariance = est.Covariance is not null ? new MatrixViewModel(est.Covariance) : null;
     }
 
     public string Step { get; }
@@ -42,6 +45,8 @@ public sealed class EstimationStepViewModel
     public IReadOnlyList<ParameterRowViewModel> Omegas { get; }
     public IReadOnlyList<ParameterRowViewModel> Sigmas { get; }
     public IReadOnlyList<string> Warnings { get; }
+    public MatrixViewModel? Correlation { get; }
+    public MatrixViewModel? Covariance { get; }
 
     internal static string FmtSeconds(double? v) =>
         v.HasValue ? v.Value.ToString("0.##", CultureInfo.InvariantCulture) : string.Empty;

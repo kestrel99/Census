@@ -43,4 +43,28 @@ public sealed partial class RunDetailViewModel : ObservableObject
 
     [ObservableProperty]
     private EstimationStepViewModel? _selectedEstimation;
+
+    public IReadOnlyList<string> MatrixKinds { get; } = ["Correlation", "Covariance"];
+
+    [ObservableProperty]
+    private string _matrixKind = "Correlation";
+
+    /// <summary>The matrix shown in the Matrices tab for the selected estimation and kind.</summary>
+    public MatrixViewModel? CurrentMatrix => MatrixKind == "Covariance"
+        ? SelectedEstimation?.Covariance
+        : SelectedEstimation?.Correlation;
+
+    public bool HasMatrix => CurrentMatrix is not null;
+
+    partial void OnSelectedEstimationChanged(EstimationStepViewModel? value)
+    {
+        OnPropertyChanged(nameof(CurrentMatrix));
+        OnPropertyChanged(nameof(HasMatrix));
+    }
+
+    partial void OnMatrixKindChanged(string value)
+    {
+        OnPropertyChanged(nameof(CurrentMatrix));
+        OnPropertyChanged(nameof(HasMatrix));
+    }
 }

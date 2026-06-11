@@ -265,6 +265,45 @@ public sealed class NonmemXmlImporterTests
     }
 
     [Fact]
+    public void Import_InlineXml_ParsesCovarianceAndCorrelationMatrices()
+    {
+        var xml = """
+            <?xml version="1.0" encoding="ASCII"?>
+            <nm:output xmlns:nm="http://namespaces.oreilly.com/xmlnut/address">
+              <nm:nonmem nm:version='7.3.0'>
+                <nm:problem nm:number='1'>
+                  <nm:estimation nm:number='1' nm:type='0'>
+                    <nm:estimation_method>focei</nm:estimation_method>
+                    <nm:termination_status>0</nm:termination_status>
+                    <nm:final_objective_function>-100.0</nm:final_objective_function>
+                    <nm:covariance>
+                      <nm:row nm:rname='THETA1'><nm:col nm:cname='THETA1'>0.04</nm:col></nm:row>
+                      <nm:row nm:rname='THETA2'><nm:col nm:cname='THETA1'>0.01</nm:col><nm:col nm:cname='THETA2'>0.09</nm:col></nm:row>
+                    </nm:covariance>
+                    <nm:correlation>
+                      <nm:row nm:rname='THETA1'><nm:col nm:cname='THETA1'>0.20</nm:col></nm:row>
+                      <nm:row nm:rname='THETA2'><nm:col nm:cname='THETA1'>0.17</nm:col><nm:col nm:cname='THETA2'>0.30</nm:col></nm:row>
+                    </nm:correlation>
+                  </nm:estimation>
+                </nm:problem>
+              </nm:nonmem>
+            </nm:output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR012.xml");
+        var est = Assert.Single(run.Estimations);
+
+        Assert.NotNull(est.Covariance);
+        Assert.Equal(["THETA1", "THETA2"], est.Covariance!.Labels);
+        Assert.Equal(0.04, est.Covariance.Values[0][0]!.Value, precision: 6);
+        Assert.Equal(0.01, est.Covariance.Values[1][0]!.Value, precision: 6);
+        Assert.Equal(0.09, est.Covariance.Values[1][1]!.Value, precision: 6);
+
+        Assert.NotNull(est.Correlation);
+        Assert.Equal(0.17, est.Correlation!.Values[1][0]!.Value, precision: 6);
+    }
+
+    [Fact]
     public void Import_InlineXml_ConditionNumber_EquicorrelationMatrix3x3()
     {
         // A 3x3 correlation matrix with 1 on the diagonal and 0.5 off-diagonal has

@@ -178,9 +178,40 @@ public partial class MainWindowViewModel : ObservableObject
         UpdateStatusText($"Deleted run {runNo}.");
     }
 
-    [RelayCommand(CanExecute = nameof(IsProjectOpen))]
-    private void Compare() =>
-        UpdateStatusText("Compare: use the run list to review runs side by side (full compare view is planned).");
+    private readonly List<RunSummaryViewModel> _compareSelection = [];
+
+    public bool CanCompare => IsProjectOpen && _compareSelection.Count >= 2;
+
+    /// <summary>Receives the run grid's current multi-selection (called from the view).</summary>
+    public void SetCompareSelection(System.Collections.IList? items)
+    {
+        _compareSelection.Clear();
+        if (items is not null)
+        {
+            foreach (var item in items)
+            {
+                if (item is RunSummaryViewModel run)
+                    _compareSelection.Add(run);
+            }
+        }
+        CompareCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCompare))]
+    private async Task CompareAsync()
+    {
+        var runs = _compareSelection.Select(r => r.Model).ToList();
+        if (runs.Count < 2)
+        {
+            UpdateStatusText("Select two or more runs to compare (Ctrl/Shift-click).");
+            return;
+        }
+
+        var win = new CompareWindow(new CompareViewModel(runs));
+        var owner = (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (owner is not null)
+            await win.ShowDialog(owner);
+    }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]
     private void Diagnostics() =>

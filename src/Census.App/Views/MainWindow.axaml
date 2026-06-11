@@ -91,7 +91,7 @@
 
         <Rectangle Width="1" Fill="#C8C8C8" Margin="4,4" />
 
-        <Button Classes="tool" Command="{Binding CompareCommand}" ToolTip.Tip="Compare runs">
+        <Button Classes="tool" Command="{Binding CompareCommand}" ToolTip.Tip="Compare selected runs (Ctrl/Shift-click two or more)">
           <StackPanel><TextBlock Classes="glyph" Text="&#xE8AB;" /><TextBlock Classes="label" Text="Compare" /></StackPanel>
         </Button>
         <Button Classes="tool" Command="{Binding DiagnosticsCommand}" ToolTip.Tip="Run diagnostics">
@@ -169,8 +169,11 @@
       <Grid Grid.Column="2" RowDefinitions="3*,4,2*">
 
         <DataGrid Grid.Row="0"
+                  x:Name="RunGrid"
                   ItemsSource="{Binding Runs}"
                   SelectedItem="{Binding SelectedRun}"
+                  SelectionMode="Extended"
+                  SelectionChanged="OnRunSelectionChanged"
                   IsReadOnly="True"
                   GridLinesVisibility="Horizontal"
                   CanUserReorderColumns="True"
