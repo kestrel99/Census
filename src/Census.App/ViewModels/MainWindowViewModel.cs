@@ -168,16 +168,30 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]
-    private void FlagRun() => SetSelectedRunKeyFlag(true);
+    private void SetFlag(string? flag)
+    {
+        if (SelectedRun is null || !int.TryParse(flag, out var value)) return;
+        var runNo = SelectedRun.RunNo;
+        _store.SetFlag(runNo, value);
+        RefreshRuns();
+        SelectedRun = Runs.FirstOrDefault(r => r.RunNo == runNo);
+    }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]
-    private void UnflagRun() => SetSelectedRunKeyFlag(false);
-
-    private void SetSelectedRunKeyFlag(bool keyRun)
+    private async Task EditRunAsync()
     {
         if (SelectedRun is null) return;
+
+        var others = Runs.Select(r => r.RunNo).Where(n => n != SelectedRun.RunNo);
+        var vm = new EditRunViewModel(SelectedRun.Model, others);
+        var win = new EditRunWindow { DataContext = vm };
+        var owner = (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (owner is null) return;
+
+        if (!await win.ShowDialog<bool>(owner)) return;
+
         var runNo = SelectedRun.RunNo;
-        _store.SetKeyRun(runNo, keyRun);
+        _store.UpdateRun(runNo, string.IsNullOrWhiteSpace(vm.ParentNo) ? null : vm.ParentNo, vm.Comment);
         RefreshRuns();
         SelectedRun = Runs.FirstOrDefault(r => r.RunNo == runNo);
     }

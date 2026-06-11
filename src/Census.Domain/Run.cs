@@ -18,8 +18,8 @@ public sealed record Run
     /// <summary>User comment.</summary>
     public string? Comment { get; init; }
 
-    /// <summary>Whether the user flagged this as a key run.</summary>
-    public bool KeyRun { get; init; }
+    /// <summary>User flag colour: 0 = unflagged, 1-5 = colour index (red/orange/yellow/green/blue).</summary>
+    public int Flag { get; init; }
 
     /// <summary>Number of observation records in the dataset.</summary>
     public int? ObsRecs { get; init; }

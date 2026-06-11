@@ -182,8 +182,27 @@
                   AutoGenerateColumns="False">
           <DataGrid.ContextMenu>
             <ContextMenu x:CompileBindings="False">
-              <MenuItem Header="Flag as key run" Command="{Binding FlagRunCommand}" />
-              <MenuItem Header="Unflag" Command="{Binding UnflagRunCommand}" />
+              <MenuItem Header="Flag">
+                <MenuItem Header="Red" Command="{Binding SetFlagCommand}" CommandParameter="1">
+                  <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="IndianRed" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Orange" Command="{Binding SetFlagCommand}" CommandParameter="2">
+                  <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="Orange" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Yellow" Command="{Binding SetFlagCommand}" CommandParameter="3">
+                  <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="Gold" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Green" Command="{Binding SetFlagCommand}" CommandParameter="4">
+                  <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="MediumSeaGreen" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Blue" Command="{Binding SetFlagCommand}" CommandParameter="5">
+                  <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="CornflowerBlue" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Unflag" Command="{Binding SetFlagCommand}" CommandParameter="0" />
+              </MenuItem>
+              <Separator />
+              <MenuItem Header="Edit…" Command="{Binding EditRunCommand}" />
               <Separator />
               <MenuItem Header="Export…" Command="{Binding ExportRunCommand}" />
               <MenuItem Header="Archive…" Command="{Binding ArchiveRunCommand}" />

@@ -26,7 +26,7 @@ public sealed class SqliteProjectStoreTests : IDisposable
         Assert.Equal("27", run.RunNo);
         Assert.Equal(27, run.IRunNo);
         Assert.Equal("12", run.ParentNo);
-        Assert.True(run.KeyRun);
+        Assert.Equal(3, run.Flag);
         Assert.Equal(1234, run.ObsRecs);
 
         var artifact = Assert.Single(run.Files);
@@ -66,6 +66,25 @@ public sealed class SqliteProjectStoreTests : IDisposable
     }
 
     [Fact]
+    public void SetFlag_And_UpdateRun_Persist()
+    {
+        var store = new SqliteProjectStore();
+        store.Create(_path);
+        store.SaveRun(SampleRun());
+
+        store.SetFlag("27", 5);
+        store.UpdateRun("27", parentNo: "9", comment: "edited comment");
+
+        var reopened = new SqliteProjectStore();
+        reopened.Open(_path);
+        var run = Assert.Single(reopened.GetRuns());
+
+        Assert.Equal(5, run.Flag);
+        Assert.Equal("9", run.ParentNo);
+        Assert.Equal("edited comment", run.Comment);
+    }
+
+    [Fact]
     public void Open_AppliesMigrationsIdempotently()
     {
         new SqliteProjectStore().Create(_path);
@@ -94,7 +113,7 @@ public sealed class SqliteProjectStoreTests : IDisposable
         IRunNo = 27,
         ParentNo = "12",
         Comment = "base model",
-        KeyRun = true,
+        Flag = 3,
         ObsRecs = 1234,
         Individuals = 56,
         StartDateTime = "2024-01-15T10:30:00",

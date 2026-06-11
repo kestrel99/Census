@@ -62,7 +62,7 @@ internal sealed class ListCommand : Command<ListCommand.Settings>
                 run.ParentNo ?? string.Empty,
                 first?.Method ?? string.Empty,
                 first?.Ofv?.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty,
-                run.KeyRun ? "[green]✓[/]" : string.Empty);
+                run.Flag != 0 ? "[green]✓[/]" : string.Empty);
         }
 
         AnsiConsole.Write(table);
