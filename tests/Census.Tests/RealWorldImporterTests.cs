@@ -81,7 +81,13 @@ public sealed class RealWorldImporterTests
                 foreach (var est in run.Estimations)
                 {
                     if (est.Parameters.Any(p => p.Shrinkage.HasValue)) withShrinkage++;
-                    if (est.ConditionNumber.HasValue) withConditionNumber++;
+                    if (est.ConditionNumber.HasValue)
+                    {
+                        withConditionNumber++;
+                        // Computed condition numbers must be positive and finite.
+                        Assert.True(est.ConditionNumber.Value > 0 && double.IsFinite(est.ConditionNumber.Value),
+                            $"{file}: non-positive/non-finite condition number {est.ConditionNumber.Value}");
+                    }
                 }
             }
         }
@@ -93,5 +99,10 @@ public sealed class RealWorldImporterTests
         // Most files with estimations should have shrinkage (real NONMEM output always includes it).
         Assert.True(withShrinkage >= withEstimations / 2,
             $"Only {withShrinkage}/{withEstimations} estimation files had shrinkage");
+
+        // Condition numbers are now derived from the correlation matrix, so runs with a
+        // successful covariance step must populate them (previously always null on NM 7.3).
+        Assert.True(withConditionNumber > 0,
+            $"No files produced a condition number out of {withEstimations} with estimations");
     }
 }

@@ -265,6 +265,37 @@ public sealed class NonmemXmlImporterTests
     }
 
     [Fact]
+    public void Import_InlineXml_ConditionNumber_EquicorrelationMatrix3x3()
+    {
+        // A 3x3 correlation matrix with 1 on the diagonal and 0.5 off-diagonal has
+        // eigenvalues 1+(n-1)*rho = 2.0 and 1-rho = 0.5 (x2), so condition number = 4.0.
+        // (Diagonal values below are standard errors, which the importer replaces with 1.)
+        var xml = """
+            <?xml version="1.0" encoding="ASCII"?>
+            <nm:output xmlns:nm="http://namespaces.oreilly.com/xmlnut/address">
+              <nm:nonmem nm:version='7.3.0'>
+                <nm:problem nm:number='1'>
+                  <nm:estimation nm:number='1' nm:type='0'>
+                    <nm:estimation_method>focei</nm:estimation_method>
+                    <nm:termination_status>0</nm:termination_status>
+                    <nm:final_objective_function>-100.0</nm:final_objective_function>
+                    <nm:correlation>
+                      <nm:row nm:rname='T1'><nm:col nm:cname='T1'>0.10</nm:col></nm:row>
+                      <nm:row nm:rname='T2'><nm:col nm:cname='T1'>0.50</nm:col><nm:col nm:cname='T2'>0.20</nm:col></nm:row>
+                      <nm:row nm:rname='T3'><nm:col nm:cname='T1'>0.50</nm:col><nm:col nm:cname='T2'>0.50</nm:col><nm:col nm:cname='T3'>0.30</nm:col></nm:row>
+                    </nm:correlation>
+                  </nm:estimation>
+                </nm:problem>
+              </nm:nonmem>
+            </nm:output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR011.xml");
+        var est = Assert.Single(run.Estimations);
+        Assert.Equal(4.0, est.ConditionNumber!.Value, precision: 6);
+    }
+
+    [Fact]
     public void Import_InlineXml_CapturesTimingsAndProblemTitleComment()
     {
         var xml = """
