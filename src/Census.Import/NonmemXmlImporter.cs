@@ -44,12 +44,32 @@ public sealed class NonmemXmlImporter : IRunImporter
 
         var runNo = DeriveRunNo(sourcePath);
 
+        // Comment defaults to the $PROBLEM title. A PsN run name, when we import one,
+        // takes precedence; until then the problem title is the best human label.
+        var problemTitle = El(firstProblem, "problem_title")?.Value?.Trim();
+
+        // Run-level timing: start/stop timestamps and total CPU time live on <output>.
+        var startDateTime = El(root, "start_datetime")?.Value?.Trim();
+        var stopDateTime = El(root, "stop_datetime")?.Value?.Trim();
+        var totalCpuTime = ParseDouble(El(root, "total_cputime")?.Value);
+
+        // Post-processing times live under <problem>/<post_process_times>.
+        var postTimes = El(firstProblem, "post_process_times");
+        var postElapsed = ParseDouble(El(postTimes, "post_elapsed_time")?.Value);
+        var finalOutputElapsed = ParseDouble(El(postTimes, "finaloutput_elapsed_time")?.Value);
+
         return new Run
         {
             RunNo = runNo,
             IRunNo = int.TryParse(runNo, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n) ? n : 0,
+            Comment = string.IsNullOrEmpty(problemTitle) ? null : problemTitle,
             ObsRecs = obsRecs,
             Individuals = individuals,
+            StartDateTime = string.IsNullOrEmpty(startDateTime) ? null : startDateTime,
+            StopDateTime = string.IsNullOrEmpty(stopDateTime) ? null : stopDateTime,
+            TotalCpuTime = totalCpuTime,
+            PostElapsedTime = postElapsed,
+            FinalOutputElapsedTime = finalOutputElapsed,
             Estimations = estimations,
             Files = [],
         };
@@ -69,6 +89,8 @@ public sealed class NonmemXmlImporter : IRunImporter
             var method = El(estEl, "estimation_method")?.Value?.Trim();
             var ofv = ParseDouble(El(estEl, "final_objective_function")?.Value);
             var conditionNumber = ParseConditionNumber(El(estEl, "covariance_status"));
+            var estimationTime = ParseDouble(El(estEl, "estimation_elapsed_time")?.Value);
+            var covarianceTime = ParseDouble(El(estEl, "covariance_elapsed_time")?.Value);
 
             // Shrinkage: prefer etashrinksd (7.3+, SD-based) over etashrink (7.2 legacy).
             var etaShrinkEl = El(estEl, "etashrinksd") ?? El(estEl, "etashrink");
@@ -88,6 +110,8 @@ public sealed class NonmemXmlImporter : IRunImporter
                 Method = method,
                 Ofv = ofv,
                 ConditionNumber = conditionNumber,
+                EstimationTime = estimationTime,
+                CovarianceTime = covarianceTime,
                 Parameters = [.. thetas, .. omegas, .. sigmas],
                 Warnings = warnings,
             });

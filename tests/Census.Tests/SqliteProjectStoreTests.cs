@@ -34,10 +34,18 @@ public sealed class SqliteProjectStoreTests : IDisposable
         Assert.Equal("run27.lst", artifact.Path);
         Assert.Equal("abc123", artifact.Md5);
 
+        Assert.Equal("2024-01-15T10:30:00", run.StartDateTime);
+        Assert.Equal("2024-01-15T10:45:00", run.StopDateTime);
+        Assert.Equal(900.0, run.TotalCpuTime);
+        Assert.Equal(1.5, run.PostElapsedTime);
+        Assert.Equal(0.7, run.FinalOutputElapsedTime);
+
         var est = Assert.Single(run.Estimations);
         Assert.Equal("FOCEI", est.Method);
         Assert.Equal(-1234.56, est.Ofv);
         Assert.Equal(12.3, est.ConditionNumber);
+        Assert.Equal(123.4, est.EstimationTime);
+        Assert.Equal(45.6, est.CovarianceTime);
         Assert.Equal("Rounding errors", Assert.Single(est.Warnings));
 
         Assert.Equal(2, est.Parameters.Count);
@@ -83,6 +91,11 @@ public sealed class SqliteProjectStoreTests : IDisposable
         KeyRun = true,
         ObsRecs = 1234,
         Individuals = 56,
+        StartDateTime = "2024-01-15T10:30:00",
+        StopDateTime = "2024-01-15T10:45:00",
+        TotalCpuTime = 900.0,
+        PostElapsedTime = 1.5,
+        FinalOutputElapsedTime = 0.7,
         Files = [new FileArtifact { Role = "output", Path = "run27.lst", Md5 = "abc123" }],
         Estimations =
         [
@@ -93,6 +106,8 @@ public sealed class SqliteProjectStoreTests : IDisposable
                 Ofv = -1234.56,
                 DOfv = -10.0,
                 ConditionNumber = 12.3,
+                EstimationTime = 123.4,
+                CovarianceTime = 45.6,
                 Warnings = ["Rounding errors"],
                 Parameters =
                 [

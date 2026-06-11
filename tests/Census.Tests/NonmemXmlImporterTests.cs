@@ -229,6 +229,53 @@ public sealed class NonmemXmlImporterTests
     }
 
     [Fact]
+    public void Import_InlineXml_CapturesTimingsAndProblemTitleComment()
+    {
+        var xml = """
+            <?xml version="1.0"?>
+            <output>
+              <start_datetime>2024-01-15T10:30:00</start_datetime>
+              <control_stream></control_stream>
+              <nmtran></nmtran>
+              <nonmem version="7.4.4">
+                <license_information></license_information>
+                <program_information></program_information>
+                <problem number="1" subproblem="0" superproblem1="0" iteration1="0" superproblem2="0" iteration2="0">
+                  <problem_title>One-compartment base model</problem_title>
+                  <problem_information></problem_information>
+                  <estimation number="1" type="1">
+                    <estimation_method>FOCEI</estimation_method>
+                    <termination_status>0</termination_status>
+                    <final_objective_function>-500.0</final_objective_function>
+                    <estimation_elapsed_time>123.4</estimation_elapsed_time>
+                    <covariance_elapsed_time>45.6</covariance_elapsed_time>
+                  </estimation>
+                  <post_process_times>
+                    <post_elapsed_time>1.5</post_elapsed_time>
+                    <finaloutput_elapsed_time>0.7</finaloutput_elapsed_time>
+                  </post_process_times>
+                </problem>
+              </nonmem>
+              <stop_datetime>2024-01-15T10:45:00</stop_datetime>
+              <total_cputime>900.0</total_cputime>
+            </output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "run9.xml");
+
+        Assert.Equal("One-compartment base model", run.Comment);
+        Assert.Equal("2024-01-15T10:30:00", run.StartDateTime);
+        Assert.Equal("2024-01-15T10:45:00", run.StopDateTime);
+        Assert.Equal(900.0, run.TotalCpuTime!.Value, precision: 3);
+        Assert.Equal(1.5, run.PostElapsedTime!.Value, precision: 3);
+        Assert.Equal(0.7, run.FinalOutputElapsedTime!.Value, precision: 3);
+
+        var est = Assert.Single(run.Estimations);
+        Assert.Equal(123.4, est.EstimationTime!.Value, precision: 3);
+        Assert.Equal(45.6, est.CovarianceTime!.Value, precision: 3);
+    }
+
+    [Fact]
     public void Import_InlineXml_FlatShrinkageRowFormat()
     {
         // NM 7.3–7.5 write shrinkage as one SUBPOP row with one col per eta,

@@ -46,8 +46,10 @@ public sealed class SqliteProjectStore : IProjectStore
 
         var runId = connection.ExecuteScalar<long>(
             """
-            INSERT INTO runs (RunNo, IRunNo, ParentNo, Comment, KeyRun, ObsRecs, Individuals, CreatedUtc)
-            VALUES (@RunNo, @IRunNo, @ParentNo, @Comment, @KeyRun, @ObsRecs, @Individuals, @CreatedUtc);
+            INSERT INTO runs (RunNo, IRunNo, ParentNo, Comment, KeyRun, ObsRecs, Individuals,
+                              StartDateTime, StopDateTime, TotalCpuTime, PostElapsedTime, FinalOutputElapsedTime, CreatedUtc)
+            VALUES (@RunNo, @IRunNo, @ParentNo, @Comment, @KeyRun, @ObsRecs, @Individuals,
+                    @StartDateTime, @StopDateTime, @TotalCpuTime, @PostElapsedTime, @FinalOutputElapsedTime, @CreatedUtc);
             SELECT last_insert_rowid();
             """,
             new
@@ -59,6 +61,11 @@ public sealed class SqliteProjectStore : IProjectStore
                 KeyRun = run.KeyRun ? 1 : 0,
                 run.ObsRecs,
                 run.Individuals,
+                run.StartDateTime,
+                run.StopDateTime,
+                run.TotalCpuTime,
+                run.PostElapsedTime,
+                run.FinalOutputElapsedTime,
                 CreatedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
             },
             tx);
@@ -75,11 +82,11 @@ public sealed class SqliteProjectStore : IProjectStore
         {
             var estId = connection.ExecuteScalar<long>(
                 """
-                INSERT INTO estimations (RunId, Number, Method, Ofv, DOfv, ConditionNumber)
-                VALUES (@runId, @Number, @Method, @Ofv, @DOfv, @ConditionNumber);
+                INSERT INTO estimations (RunId, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime)
+                VALUES (@runId, @Number, @Method, @Ofv, @DOfv, @ConditionNumber, @EstimationTime, @CovarianceTime);
                 SELECT last_insert_rowid();
                 """,
-                new { runId, estimation.Number, estimation.Method, estimation.Ofv, estimation.DOfv, estimation.ConditionNumber },
+                new { runId, estimation.Number, estimation.Method, estimation.Ofv, estimation.DOfv, estimation.ConditionNumber, estimation.EstimationTime, estimation.CovarianceTime },
                 tx);
 
             foreach (var p in estimation.Parameters)
@@ -110,7 +117,11 @@ public sealed class SqliteProjectStore : IProjectStore
         using var connection = OpenConnection();
 
         var runRows = connection.Query<RunRow>(
-            "SELECT Id, RunNo, IRunNo, ParentNo, Comment, KeyRun, ObsRecs, Individuals FROM runs ORDER BY IRunNo;")
+            """
+            SELECT Id, RunNo, IRunNo, ParentNo, Comment, KeyRun, ObsRecs, Individuals,
+                   StartDateTime, StopDateTime, TotalCpuTime, PostElapsedTime, FinalOutputElapsedTime
+            FROM runs ORDER BY IRunNo;
+            """)
             .ToList();
 
         var runs = new List<Run>(runRows.Count);
@@ -121,7 +132,7 @@ public sealed class SqliteProjectStore : IProjectStore
                 new { id = r.Id }).ToList();
 
             var estRows = connection.Query<EstimationRow>(
-                "SELECT Id, Number, Method, Ofv, DOfv, ConditionNumber FROM estimations WHERE RunId = @id ORDER BY Number;",
+                "SELECT Id, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime FROM estimations WHERE RunId = @id ORDER BY Number;",
                 new { id = r.Id }).ToList();
 
             var estimations = new List<Estimation>(estRows.Count);
@@ -152,6 +163,8 @@ public sealed class SqliteProjectStore : IProjectStore
                     Ofv = e.Ofv,
                     DOfv = e.DOfv,
                     ConditionNumber = e.ConditionNumber,
+                    EstimationTime = e.EstimationTime,
+                    CovarianceTime = e.CovarianceTime,
                     Parameters = parameters,
                     Warnings = warnings,
                 });
@@ -166,6 +179,11 @@ public sealed class SqliteProjectStore : IProjectStore
                 KeyRun = r.KeyRun != 0,
                 ObsRecs = (int?)r.ObsRecs,
                 Individuals = (int?)r.Individuals,
+                StartDateTime = r.StartDateTime,
+                StopDateTime = r.StopDateTime,
+                TotalCpuTime = r.TotalCpuTime,
+                PostElapsedTime = r.PostElapsedTime,
+                FinalOutputElapsedTime = r.FinalOutputElapsedTime,
                 Files = files,
                 Estimations = estimations,
             });
@@ -191,9 +209,10 @@ public sealed class SqliteProjectStore : IProjectStore
 
     // Row DTOs for Dapper mapping. SQLite returns INTEGER columns as Int64, so these use
     // long/long? to match; conversion to the domain's int types happens at the call site.
-    private sealed record RunRow(long Id, string RunNo, long IRunNo, string? ParentNo, string? Comment, long KeyRun, long? ObsRecs, long? Individuals);
+    private sealed record RunRow(long Id, string RunNo, long IRunNo, string? ParentNo, string? Comment, long KeyRun, long? ObsRecs, long? Individuals,
+        string? StartDateTime, string? StopDateTime, double? TotalCpuTime, double? PostElapsedTime, double? FinalOutputElapsedTime);
 
-    private sealed record EstimationRow(long Id, long Number, string? Method, double? Ofv, double? DOfv, double? ConditionNumber);
+    private sealed record EstimationRow(long Id, long Number, string? Method, double? Ofv, double? DOfv, double? ConditionNumber, double? EstimationTime, double? CovarianceTime);
 
     private sealed record ParameterRow(string Kind, long Index, string? Label, double? Estimate, double? StandardError, double? Shrinkage);
 }

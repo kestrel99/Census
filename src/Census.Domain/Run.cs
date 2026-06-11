@@ -27,6 +27,21 @@ public sealed record Run
     /// <summary>Number of individuals in the dataset.</summary>
     public int? Individuals { get; init; }
 
+    /// <summary>Run start timestamp (NONMEM <c>start_datetime</c>), as reported in the output.</summary>
+    public string? StartDateTime { get; init; }
+
+    /// <summary>Run stop timestamp (NONMEM <c>stop_datetime</c>), as reported in the output.</summary>
+    public string? StopDateTime { get; init; }
+
+    /// <summary>Total CPU time in seconds (NONMEM <c>total_cputime</c>).</summary>
+    public double? TotalCpuTime { get; init; }
+
+    /// <summary>Post-processing elapsed time in seconds (NONMEM <c>post_elapsed_time</c>).</summary>
+    public double? PostElapsedTime { get; init; }
+
+    /// <summary>Final-output elapsed time in seconds (NONMEM <c>finaloutput_elapsed_time</c>).</summary>
+    public double? FinalOutputElapsedTime { get; init; }
+
     /// <summary>Estimation steps in this run (NONMEM may run several methods).</summary>
     public IReadOnlyList<Estimation> Estimations { get; init; } = [];
 
@@ -51,6 +66,12 @@ public sealed record Estimation
 
     /// <summary>Condition number of the covariance step, if available.</summary>
     public double? ConditionNumber { get; init; }
+
+    /// <summary>Estimation elapsed time in seconds (NONMEM <c>estimation_elapsed_time</c>).</summary>
+    public double? EstimationTime { get; init; }
+
+    /// <summary>Covariance-step elapsed time in seconds (NONMEM <c>covariance_elapsed_time</c>).</summary>
+    public double? CovarianceTime { get; init; }
 
     public IReadOnlyList<Parameter> Parameters { get; init; } = [];
 

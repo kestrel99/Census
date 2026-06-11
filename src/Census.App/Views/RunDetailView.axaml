@@ -31,11 +31,13 @@
                 GridLinesVisibility="Horizontal"
                 AutoGenerateColumns="False">
         <DataGrid.Columns>
-          <DataGridTextColumn Header="Step"   Binding="{Binding Step}"            Width="50"  />
-          <DataGridTextColumn Header="Title"  Binding="{Binding Title}"           Width="*"   />
-          <DataGridTextColumn Header="Status" Binding="{Binding Status}"          Width="100" />
-          <DataGridTextColumn Header="OFV"    Binding="{Binding Ofv}"             Width="100" />
-          <DataGridTextColumn Header="Cond No" Binding="{Binding ConditionNumber}" Width="80" />
+          <DataGridTextColumn Header="Step"     Binding="{Binding Step}"            Width="44"  />
+          <DataGridTextColumn Header="Title"    Binding="{Binding Title}"           Width="*"   />
+          <DataGridTextColumn Header="Status"   Binding="{Binding Status}"          Width="90"  />
+          <DataGridTextColumn Header="Est Time" Binding="{Binding EstTime}"         Width="80"  />
+          <DataGridTextColumn Header="Cov Time" Binding="{Binding CovTime}"         Width="80"  />
+          <DataGridTextColumn Header="OFV"      Binding="{Binding Ofv}"             Width="90"  />
+          <DataGridTextColumn Header="Cond No"  Binding="{Binding ConditionNumber}" Width="70"  />
         </DataGrid.Columns>
       </DataGrid>
     </DockPanel>

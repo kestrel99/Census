@@ -21,12 +21,29 @@ public sealed partial class RunDetailViewModel : ObservableObject
         Individuals = run.Individuals?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
         FileCount = run.Files.Count.ToString(CultureInfo.InvariantCulture);
 
-        Estimations = new ObservableCollection<EstimationStepViewModel>(
-            run.Estimations.Select(e => new EstimationStepViewModel(e)));
+        var rows = run.Estimations.Select(e => new EstimationStepViewModel(e)).ToList();
 
-        // Default to the final estimation step, as the original UI does.
-        SelectedEstimation = Estimations.Count > 0 ? Estimations[^1] : null;
+        // Run-level timing values appear as extra rows after the estimation steps.
+        AddTimingRow(rows, "Start time", run.StartDateTime);
+        AddTimingRow(rows, "Stop time", run.StopDateTime);
+        AddTimingRow(rows, "Total CPU time", FmtSeconds(run.TotalCpuTime));
+        AddTimingRow(rows, "Post-process time", FmtSeconds(run.PostElapsedTime));
+        AddTimingRow(rows, "Final output time", FmtSeconds(run.FinalOutputElapsedTime));
+
+        Estimations = new ObservableCollection<EstimationStepViewModel>(rows);
+
+        // Default to the final estimation step (not a timing row), as the original UI does.
+        SelectedEstimation = Estimations.LastOrDefault(r => r.IsEstimation) ?? Estimations.FirstOrDefault();
     }
+
+    private static void AddTimingRow(List<EstimationStepViewModel> rows, string label, string? value)
+    {
+        if (!string.IsNullOrEmpty(value))
+            rows.Add(new EstimationStepViewModel(label, value));
+    }
+
+    private static string? FmtSeconds(double? v) =>
+        v.HasValue ? v.Value.ToString("0.##", CultureInfo.InvariantCulture) : null;
 
     public string RunNo { get; }
     public string ParentNo { get; }
