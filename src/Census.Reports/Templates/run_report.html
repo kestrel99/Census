@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Census Run Report &#8211; {{ run_no }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+    th, td { border: 1px solid #888; padding: 4px 8px; text-align: left; }
+    th { background: #dde; }
+    .section-theta td:first-child { font-style: italic; }
+    caption { text-align: left; font-weight: bold; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+<h1>Run {{ run_no }}</h1>
+{{ if obs_recs }}<p>Observations: {{ obs_recs }}{{ if individuals }}, Individuals: {{ individuals }}{{ end }}</p>{{ end }}
+
+{{ for est in estimations }}
+<h2>Estimation {{ est.number }}{{ if est.method }} ({{ est.method }}){{ end }}</h2>
+{{ if est.ofv }}<p>OFV: {{ est.ofv }}{{ if est.condition_number }}, Condition number: {{ est.condition_number }}{{ end }}</p>{{ end }}
+
+{{ if est.warnings }}
+<ul>{{ for w in est.warnings }}<li>{{ w }}</li>{{ end }}</ul>
+{{ end }}
+
+<table>
+  <thead>
+    <tr>
+      <th>No.</th><th>Parameter</th><th>Estimate</th><th>S.E.</th>
+      <th>%RSE</th><th>95% CI</th><th>Shrinkage&nbsp;(%)</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{ for p in est.parameters }}
+    <tr>
+      <td>{{ p.kind }}{{ p.index }}</td>
+      <td>{{ p.label }}</td>
+      <td>{{ p.estimate }}</td>
+      <td>{{ p.se }}</td>
+      <td>{{ p.rse }}</td>
+      <td>{{ if p.ci_lower != "" }}{{ p.ci_lower }}&nbsp;&#8211;&nbsp;{{ p.ci_upper }}{{ end }}</td>
+      <td>{{ p.shrinkage }}</td>
+    </tr>
+  {{ end }}
+  </tbody>
+</table>
+{{ end }}
+</body>
+</html>

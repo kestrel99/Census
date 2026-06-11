@@ -9,4 +9,8 @@
     <PackageReference Include="Scriban" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\run_report.html" />
+  </ItemGroup>
+
 </Project>
