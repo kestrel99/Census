@@ -16,12 +16,16 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var settings = new JsonSettingsService();
+            // Apply the saved grid font size before the main window resolves the resource.
+            Resources["GridFontSize"] = settings.Load().GridFontSize;
+
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(
                     new SqliteProjectStore(),
                     new AvaloniaDialogService(),
-                    new JsonSettingsService()),
+                    settings),
             };
         }
 

@@ -3,11 +3,29 @@
              x:Class="Census.App.App"
              RequestedThemeVariant="Light">
 
+  <Application.Resources>
+    <!-- Grid contents/headers font size. User-configurable; updated live from Preferences. -->
+    <x:Double x:Key="GridFontSize">11</x:Double>
+    <!-- Standardize the Fluent tab-header font to match the rest of the UI. -->
+    <x:Double x:Key="TabItemHeaderFontSize">12</x:Double>
+  </Application.Resources>
+
   <Application.Styles>
     <FluentTheme />
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
     <Style Selector="Window">
       <Setter Property="FontFamily" Value="Segoe UI Variable Text,Segoe UI,sans-serif" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <!-- Grid contents and column headers use the user-configurable grid font size. -->
+    <Style Selector="DataGridCell">
+      <Setter Property="FontSize" Value="{DynamicResource GridFontSize}" />
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+      <Setter Property="FontSize" Value="{DynamicResource GridFontSize}" />
+    </Style>
+    <!-- Standardize tab-header font size with everything else. -->
+    <Style Selector="TabItem">
       <Setter Property="FontSize" Value="12" />
     </Style>
   </Application.Styles>
