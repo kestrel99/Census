@@ -25,26 +25,26 @@ public sealed class CompareViewModel
 {
     public CompareViewModel(IReadOnlyList<Run> runs)
     {
-        var ordered = runs.OrderBy(r => r.IRunNo).ToList();
+        // Preserve selection order: the first selected run is the first column and the
+        // reference against which every other run's dOFV is computed.
+        var ordered = runs.ToList();
         RunHeaders = ordered.Select(r => r.RunNo).ToList();
-        var byNo = ordered.ToDictionary(r => r.RunNo, r => r);
 
         static Estimation? Last(Run r) => r.Estimations.Count > 0 ? r.Estimations[^1] : null;
+
+        var referenceOfv = ordered.Count > 0 ? Last(ordered[0])?.Ofv : null;
 
         var rows = new List<CompareRowViewModel>
         {
             new("OFV", ordered.Select(r =>
                 Last(r)?.Ofv?.ToString("0.000", CultureInfo.InvariantCulture) ?? string.Empty).ToList()),
 
-            new("dOFV", ordered.Select(r =>
+            new("dOFV (vs first)", ordered.Select(r =>
             {
-                var est = Last(r);
-                if (r.ParentNo is not null && byNo.TryGetValue(r.ParentNo, out var parent)
-                    && est?.Ofv is double ofv && Last(parent)?.Ofv is double parentOfv)
-                {
-                    return (ofv - parentOfv).ToString("+0.000;-0.000;0.000", CultureInfo.InvariantCulture);
-                }
-                return string.Empty;
+                var ofv = Last(r)?.Ofv;
+                if (ofv is null || referenceOfv is null)
+                    return string.Empty;
+                return (ofv.Value - referenceOfv.Value).ToString("+0.000;-0.000;0.000", CultureInfo.InvariantCulture);
             }).ToList()),
 
             new("Condition no.", ordered.Select(r =>
