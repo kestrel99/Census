@@ -198,7 +198,10 @@
             </DataGridTemplateColumn>
             <DataGridTextColumn Header="Parent" Binding="{Binding ParentNo}" Width="70" />
             <DataGridTextColumn Header="Cond No" Binding="{Binding ConditionNumber}" Width="90" />
-            <DataGridTextColumn Header="Warnings" Binding="{Binding Warnings}" Width="*" />
+            <DataGridTextColumn Header="Warnings" Binding="{Binding Warnings}" Width="70" />
+            <DataGridTextColumn Header="Start" Binding="{Binding StartDateTime}" Width="140" />
+            <DataGridTextColumn Header="Stop" Binding="{Binding StopDateTime}" Width="140" />
+            <DataGridTextColumn Header="Total CPU" Binding="{Binding TotalCpuTime}" Width="*" />
           </DataGrid.Columns>
         </DataGrid>
 

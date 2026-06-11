@@ -38,6 +38,11 @@ public sealed class RunSummaryViewModel
         Individuals = run.Individuals?.ToString() ?? string.Empty;
         KeyRun = run.KeyRun;
         WarningCount = run.Estimations.Sum(e => e.Warnings.Count);
+
+        // Run-level timings (apply to the whole run). Show datetimes with a space, not 'T'.
+        StartDateTime = run.StartDateTime?.Replace('T', ' ') ?? string.Empty;
+        StopDateTime = run.StopDateTime?.Replace('T', ' ') ?? string.Empty;
+        TotalCpuTime = run.TotalCpuTime?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
     }
 
     public string RunNo { get; }
@@ -52,6 +57,9 @@ public sealed class RunSummaryViewModel
     public bool KeyRun { get; }
     public int WarningCount { get; }
     public string Warnings => WarningCount > 0 ? WarningCount.ToString() : string.Empty;
+    public string StartDateTime { get; }
+    public string StopDateTime { get; }
+    public string TotalCpuTime { get; }
 
     /// <summary>Status circle in the run list: green = key run, red = has warnings, else none.</summary>
     public IBrush FlagBrush => KeyRun

@@ -4,21 +4,21 @@ using Census.Domain;
 namespace Census.App.ViewModels;
 
 /// <summary>
-/// A row in the bottom-left "Estimation" grid. Most rows are estimation steps (selecting
-/// one drives the parameter tabs). The grid also carries run-level timing rows
-/// (start/stop time, total CPU time, post-processing times) appended after the steps.
+/// One estimation ($EST) step shown in the bottom-left "Estimation" grid. Selecting a
+/// step drives the parameter tabs (theta/omega/sigma) on the right. Post-process and
+/// final-output times are per-problem values, shown on every step row of the run.
 /// </summary>
 public sealed class EstimationStepViewModel
 {
-    /// <summary>Estimation-step row.</summary>
-    public EstimationStepViewModel(Estimation est)
+    public EstimationStepViewModel(Estimation est, string postTime, string finalOutTime)
     {
-        IsEstimation = true;
         Step = est.Number.ToString(CultureInfo.InvariantCulture);
         Title = est.Method ?? string.Empty;
         Status = est.Warnings.Count > 0 ? "Terminated" : "Successful";
         EstTime = FmtSeconds(est.EstimationTime);
         CovTime = FmtSeconds(est.CovarianceTime);
+        PostTime = postTime;
+        FinalOutTime = finalOutTime;
         Ofv = est.Ofv?.ToString("0.000", CultureInfo.InvariantCulture) ?? string.Empty;
         ConditionNumber = est.ConditionNumber?.ToString("0.###", CultureInfo.InvariantCulture) ?? string.Empty;
 
@@ -29,29 +29,13 @@ public sealed class EstimationStepViewModel
         Warnings = est.Warnings;
     }
 
-    /// <summary>Run-level timing row (no parameters); the value is shown in the Est Time column.</summary>
-    public EstimationStepViewModel(string title, string value)
-    {
-        IsEstimation = false;
-        Step = string.Empty;
-        Title = title;
-        Status = string.Empty;
-        EstTime = value;
-        CovTime = string.Empty;
-        Ofv = string.Empty;
-        ConditionNumber = string.Empty;
-        Thetas = [];
-        Omegas = [];
-        Sigmas = [];
-        Warnings = [];
-    }
-
-    public bool IsEstimation { get; }
     public string Step { get; }
     public string Title { get; }
     public string Status { get; }
     public string EstTime { get; }
     public string CovTime { get; }
+    public string PostTime { get; }
+    public string FinalOutTime { get; }
     public string Ofv { get; }
     public string ConditionNumber { get; }
     public IReadOnlyList<ParameterRowViewModel> Thetas { get; }
@@ -59,8 +43,8 @@ public sealed class EstimationStepViewModel
     public IReadOnlyList<ParameterRowViewModel> Sigmas { get; }
     public IReadOnlyList<string> Warnings { get; }
 
-    private static string FmtSeconds(double? v) =>
+    internal static string FmtSeconds(double? v) =>
         v.HasValue ? v.Value.ToString("0.##", CultureInfo.InvariantCulture) : string.Empty;
 
-    public override string ToString() => IsEstimation ? $"{Step}: {Title}" : Title;
+    public override string ToString() => $"{Step}: {Title}";
 }
