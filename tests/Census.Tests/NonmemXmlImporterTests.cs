@@ -229,6 +229,42 @@ public sealed class NonmemXmlImporterTests
     }
 
     [Fact]
+    public void Import_InlineXml_ComputesConditionNumberFromCorrelationMatrix()
+    {
+        // NM 7.3-style output: no <eigenvalues>, covariance_status eigenvalues zeroed,
+        // but a <correlation> matrix is present. The 2x2 correlation matrix [[1,0.5],[0.5,1]]
+        // has eigenvalues 1.5 and 0.5, so the condition number is 3.0.
+        var xml = """
+            <?xml version="1.0" encoding="ASCII"?>
+            <nm:output xmlns:nm="http://namespaces.oreilly.com/xmlnut/address">
+              <nm:nonmem nm:version='7.3.0'>
+                <nm:problem nm:number='1'>
+                  <nm:estimation nm:number='1' nm:type='0'>
+                    <nm:estimation_method>focei</nm:estimation_method>
+                    <nm:termination_status>0</nm:termination_status>
+                    <nm:final_objective_function>-100.0</nm:final_objective_function>
+                    <nm:covariance_status nm:error='0' nm:numnegeigenvalues='-1' nm:mineigenvalue='0.0' nm:maxeigenvalue='0.0' nm:rms='0.0'/>
+                    <nm:correlation>
+                      <nm:row nm:rname='THETA1'>
+                        <nm:col nm:cname='THETA1'>0.10</nm:col>
+                      </nm:row>
+                      <nm:row nm:rname='THETA2'>
+                        <nm:col nm:cname='THETA1'>0.50</nm:col>
+                        <nm:col nm:cname='THETA2'>0.20</nm:col>
+                      </nm:row>
+                    </nm:correlation>
+                  </nm:estimation>
+                </nm:problem>
+              </nm:nonmem>
+            </nm:output>
+            """;
+
+        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR010.xml");
+        var est = Assert.Single(run.Estimations);
+        Assert.Equal(3.0, est.ConditionNumber!.Value, precision: 6);
+    }
+
+    [Fact]
     public void Import_InlineXml_CapturesTimingsAndProblemTitleComment()
     {
         var xml = """

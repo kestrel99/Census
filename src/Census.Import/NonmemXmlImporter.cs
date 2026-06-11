@@ -88,7 +88,13 @@ public sealed class NonmemXmlImporter : IRunImporter
             var number = ParseInt(Attr(estEl, "number")) ?? 0;
             var method = El(estEl, "estimation_method")?.Value?.Trim();
             var ofv = ParseDouble(El(estEl, "final_objective_function")?.Value);
-            var conditionNumber = ParseConditionNumber(El(estEl, "covariance_status"));
+            // Condition number = ratio of largest to smallest eigenvalue of the correlation
+            // matrix. Prefer an explicit <eigenvalues> vector or populated covariance_status;
+            // otherwise compute it from the <correlation> matrix (NM 7.3 leaves the others empty).
+            var conditionNumber =
+                ConditionNumberFromEigenvalues(El(estEl, "eigenvalues"))
+                ?? ConditionNumberFromCovarianceStatus(El(estEl, "covariance_status"))
+                ?? ConditionNumberFromCorrelation(El(estEl, "correlation"));
             var estimationTime = ParseDouble(El(estEl, "estimation_elapsed_time")?.Value);
             var covarianceTime = ParseDouble(El(estEl, "covariance_elapsed_time")?.Value);
 
@@ -201,7 +207,33 @@ public sealed class NonmemXmlImporter : IRunImporter
         return rows.Select(r => ParseDouble(Els(r, "col").FirstOrDefault()?.Value)).ToList();
     }
 
-    private static double? ParseConditionNumber(XElement? covStatusEl)
+    // Condition number from an explicit <eigenvalues> vector (eigenvalues of the correlation matrix).
+    private static double? ConditionNumberFromEigenvalues(XElement? eigEl)
+    {
+        if (eigEl is null)
+        {
+            return null;
+        }
+
+        var vals = Els(eigEl, "val")
+            .Select(v => ParseDouble(v.Value))
+            .Where(d => d.HasValue)
+            .Select(d => d!.Value)
+            .ToList();
+
+        if (vals.Count == 0)
+        {
+            return null;
+        }
+
+        var min = vals.Min();
+        var max = vals.Max();
+        return min > 0 ? max / min : null;
+    }
+
+    // Condition number from covariance_status eigenvalue attributes, when populated and positive.
+    // Some NONMEM versions leave these zero (or negative for non-positive-definite matrices).
+    private static double? ConditionNumberFromCovarianceStatus(XElement? covStatusEl)
     {
         if (covStatusEl is null)
         {
@@ -211,12 +243,126 @@ public sealed class NonmemXmlImporter : IRunImporter
         var minVal = ParseDouble(Attr(covStatusEl, "mineigenvalue"));
         var maxVal = ParseDouble(Attr(covStatusEl, "maxeigenvalue"));
 
-        if (minVal is null || maxVal is null || minVal == 0.0)
+        if (minVal is null || maxVal is null || minVal.Value <= 0.0 || maxVal.Value <= 0.0)
         {
             return null;
         }
 
-        return maxVal / minVal;
+        return maxVal.Value / minVal.Value;
+    }
+
+    // Condition number computed from the <correlation> matrix. NONMEM stores standard errors on
+    // the diagonal and correlation coefficients off-diagonal; the condition number is the ratio of
+    // the largest to smallest eigenvalue of the correlation matrix (unit diagonal). Parameters with
+    // no standard error (fixed) are excluded, matching NONMEM.
+    private static double? ConditionNumberFromCorrelation(XElement? corrEl)
+    {
+        if (corrEl is null)
+        {
+            return null;
+        }
+
+        var rows = Els(corrEl, "row").ToList();
+        var n = rows.Count;
+        if (n == 0)
+        {
+            return null;
+        }
+
+        var cells = rows.Select(r => Els(r, "col").Select(c => ParseDouble(c.Value)).ToList()).ToList();
+
+        // Active parameters have a non-zero standard error on the diagonal.
+        var active = Enumerable.Range(0, n)
+            .Where(i => i < cells[i].Count && (cells[i][i] ?? 0.0) != 0.0)
+            .ToArray();
+
+        var m = active.Length;
+        if (m == 0)
+        {
+            return null;
+        }
+
+        var r = new double[m, m];
+        for (var a = 0; a < m; a++)
+        {
+            r[a, a] = 1.0;
+            var i = active[a];
+            for (var b = 0; b < a; b++)
+            {
+                var j = active[b];
+                var v = j < cells[i].Count ? cells[i][j] ?? 0.0 : 0.0;
+                r[a, b] = v;
+                r[b, a] = v;
+            }
+        }
+
+        var eig = SymmetricEigenvalues(r, m);
+        var min = eig.Min();
+        var max = eig.Max();
+        return min > 0 ? max / min : null;
+    }
+
+    // Eigenvalues of a symmetric matrix via the cyclic Jacobi rotation method.
+    private static double[] SymmetricEigenvalues(double[,] a, int n)
+    {
+        for (var sweep = 0; sweep < 100; sweep++)
+        {
+            var off = 0.0;
+            for (var p = 0; p < n; p++)
+            {
+                for (var q = p + 1; q < n; q++)
+                {
+                    off += a[p, q] * a[p, q];
+                }
+            }
+
+            if (off < 1e-20)
+            {
+                break;
+            }
+
+            for (var p = 0; p < n; p++)
+            {
+                for (var q = p + 1; q < n; q++)
+                {
+                    if (Math.Abs(a[p, q]) < 1e-300)
+                    {
+                        continue;
+                    }
+
+                    var theta = (a[q, q] - a[p, p]) / (2.0 * a[p, q]);
+                    var t = theta == 0.0
+                        ? 1.0
+                        : Math.Sign(theta) / (Math.Abs(theta) + Math.Sqrt(theta * theta + 1.0));
+                    var c = 1.0 / Math.Sqrt(t * t + 1.0);
+                    var s = t * c;
+
+                    for (var k = 0; k < n; k++)
+                    {
+                        var akp = a[k, p];
+                        var akq = a[k, q];
+                        a[k, p] = c * akp - s * akq;
+                        a[k, q] = s * akp + c * akq;
+                    }
+
+                    for (var k = 0; k < n; k++)
+                    {
+                        var apk = a[p, k];
+                        var aqk = a[q, k];
+                        a[p, k] = c * apk - s * aqk;
+                        a[q, k] = s * apk + c * aqk;
+                    }
+                }
+            }
+        }
+
+        var eigenvalues = new double[n];
+        for (var i = 0; i < n; i++)
+        {
+            eigenvalues[i] = a[i, i];
+        }
+
+        return eigenvalues;
     }
 
     private static List<string> ParseWarnings(XElement? statusEl, XElement? infoEl)
