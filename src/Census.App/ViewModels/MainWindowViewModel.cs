@@ -178,13 +178,32 @@ public partial class MainWindowViewModel : ObservableObject
         UpdateStatusText($"Deleted run {runNo}.");
     }
 
-    [RelayCommand(CanExecute = nameof(IsProjectOpen))]
+    private readonly List<RunSummaryViewModel> _compareSelection = [];
+
+    public bool CanCompare => IsProjectOpen && _compareSelection.Count >= 2;
+
+    /// <summary>Receives the run grid's current multi-selection (called from the view).</summary>
+    public void SetCompareSelection(System.Collections.IList? items)
+    {
+        _compareSelection.Clear();
+        if (items is not null)
+        {
+            foreach (var item in items)
+            {
+                if (item is RunSummaryViewModel run)
+                    _compareSelection.Add(run);
+            }
+        }
+        CompareCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCompare))]
     private async Task CompareAsync()
     {
-        var runs = _store.GetRuns();
-        if (runs.Count == 0)
+        var runs = _compareSelection.Select(r => r.Model).ToList();
+        if (runs.Count < 2)
         {
-            UpdateStatusText("No runs to compare.");
+            UpdateStatusText("Select two or more runs to compare (Ctrl/Shift-click).");
             return;
         }
 
