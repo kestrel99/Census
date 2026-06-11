@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Census.Archive\Census.Archive.csproj" />
     <ProjectReference Include="..\..\src\Census.Domain\Census.Domain.csproj" />
     <ProjectReference Include="..\..\src\Census.Import\Census.Import.csproj" />
     <ProjectReference Include="..\..\src\Census.Storage\Census.Storage.csproj" />
