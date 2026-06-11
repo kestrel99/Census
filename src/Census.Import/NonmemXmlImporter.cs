@@ -118,6 +118,8 @@ public sealed class NonmemXmlImporter : IRunImporter
                 ConditionNumber = conditionNumber,
                 EstimationTime = estimationTime,
                 CovarianceTime = covarianceTime,
+                Covariance = ParseNamedMatrix(El(estEl, "covariance")),
+                Correlation = ParseNamedMatrix(El(estEl, "correlation")),
                 Parameters = [.. thetas, .. omegas, .. sigmas],
                 Warnings = warnings,
             });
@@ -188,6 +190,28 @@ public sealed class NonmemXmlImporter : IRunImporter
         }
 
         return result;
+    }
+
+    // Parse a labelled lower-triangular matrix (covariance/correlation) from its XML element.
+    private static NamedMatrix? ParseNamedMatrix(XElement? matEl)
+    {
+        if (matEl is null)
+        {
+            return null;
+        }
+
+        var rows = Els(matEl, "row").ToList();
+        if (rows.Count == 0)
+        {
+            return null;
+        }
+
+        var labels = rows.Select(r => Attr(r, "rname")?.Trim() ?? string.Empty).ToList();
+        var values = rows
+            .Select(r => (IReadOnlyList<double?>)Els(r, "col").Select(c => ParseDouble(c.Value)).ToList())
+            .ToList();
+
+        return new NamedMatrix { Labels = labels, Values = values };
     }
 
     // Shrinkage tables come in two layouts:

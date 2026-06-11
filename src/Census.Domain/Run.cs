@@ -73,9 +73,26 @@ public sealed record Estimation
     /// <summary>Covariance-step elapsed time in seconds (NONMEM <c>covariance_elapsed_time</c>).</summary>
     public double? CovarianceTime { get; init; }
 
+    /// <summary>Variance-covariance matrix of the estimates, if a covariance step ran.</summary>
+    public NamedMatrix? Covariance { get; init; }
+
+    /// <summary>Correlation matrix of the estimates (SE on the diagonal), if available.</summary>
+    public NamedMatrix? Correlation { get; init; }
+
     public IReadOnlyList<Parameter> Parameters { get; init; } = [];
 
     public IReadOnlyList<string> Warnings { get; init; } = [];
+}
+
+/// <summary>
+/// A labelled lower-triangular symmetric matrix (covariance/correlation of the estimates).
+/// <see cref="Values"/>[i] holds the i+1 entries of row i (columns 0..i).
+/// </summary>
+public sealed record NamedMatrix
+{
+    public required IReadOnlyList<string> Labels { get; init; }
+
+    public required IReadOnlyList<IReadOnlyList<double?>> Values { get; init; }
 }
 
 public enum ParameterKind

@@ -48,6 +48,12 @@ public sealed class SqliteProjectStoreTests : IDisposable
         Assert.Equal(45.6, est.CovarianceTime);
         Assert.Equal("Rounding errors", Assert.Single(est.Warnings));
 
+        Assert.NotNull(est.Correlation);
+        Assert.Equal(["CL", "V"], est.Correlation!.Labels);
+        Assert.Equal(0.25, est.Correlation.Values[1][0]!.Value);
+        Assert.NotNull(est.Covariance);
+        Assert.Equal(0.02, est.Covariance!.Values[0][0]!.Value);
+
         Assert.Equal(2, est.Parameters.Count);
         var theta = Assert.Single(est.Parameters, p => p.Kind == ParameterKind.Theta);
         Assert.Equal(1, theta.Index);
@@ -108,6 +114,16 @@ public sealed class SqliteProjectStoreTests : IDisposable
                 ConditionNumber = 12.3,
                 EstimationTime = 123.4,
                 CovarianceTime = 45.6,
+                Correlation = new NamedMatrix
+                {
+                    Labels = ["CL", "V"],
+                    Values = [[0.15], [0.25, 0.80]],
+                },
+                Covariance = new NamedMatrix
+                {
+                    Labels = ["CL", "V"],
+                    Values = [[0.02], [0.01, 0.64]],
+                },
                 Warnings = ["Rounding errors"],
                 Parameters =
                 [

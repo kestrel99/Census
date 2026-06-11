@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json;
 using Census.Domain;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -82,11 +83,23 @@ public sealed class SqliteProjectStore : IProjectStore
         {
             var estId = connection.ExecuteScalar<long>(
                 """
-                INSERT INTO estimations (RunId, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime)
-                VALUES (@runId, @Number, @Method, @Ofv, @DOfv, @ConditionNumber, @EstimationTime, @CovarianceTime);
+                INSERT INTO estimations (RunId, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime, CovarianceJson, CorrelationJson)
+                VALUES (@runId, @Number, @Method, @Ofv, @DOfv, @ConditionNumber, @EstimationTime, @CovarianceTime, @CovarianceJson, @CorrelationJson);
                 SELECT last_insert_rowid();
                 """,
-                new { runId, estimation.Number, estimation.Method, estimation.Ofv, estimation.DOfv, estimation.ConditionNumber, estimation.EstimationTime, estimation.CovarianceTime },
+                new
+                {
+                    runId,
+                    estimation.Number,
+                    estimation.Method,
+                    estimation.Ofv,
+                    estimation.DOfv,
+                    estimation.ConditionNumber,
+                    estimation.EstimationTime,
+                    estimation.CovarianceTime,
+                    CovarianceJson = SerializeMatrix(estimation.Covariance),
+                    CorrelationJson = SerializeMatrix(estimation.Correlation),
+                },
                 tx);
 
             foreach (var p in estimation.Parameters)
@@ -132,7 +145,7 @@ public sealed class SqliteProjectStore : IProjectStore
                 new { id = r.Id }).ToList();
 
             var estRows = connection.Query<EstimationRow>(
-                "SELECT Id, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime FROM estimations WHERE RunId = @id ORDER BY Number;",
+                "SELECT Id, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime, CovarianceJson, CorrelationJson FROM estimations WHERE RunId = @id ORDER BY Number;",
                 new { id = r.Id }).ToList();
 
             var estimations = new List<Estimation>(estRows.Count);
@@ -165,6 +178,8 @@ public sealed class SqliteProjectStore : IProjectStore
                     ConditionNumber = e.ConditionNumber,
                     EstimationTime = e.EstimationTime,
                     CovarianceTime = e.CovarianceTime,
+                    Covariance = DeserializeMatrix(e.CovarianceJson),
+                    Correlation = DeserializeMatrix(e.CorrelationJson),
                     Parameters = parameters,
                     Warnings = warnings,
                 });
@@ -212,7 +227,45 @@ public sealed class SqliteProjectStore : IProjectStore
     private sealed record RunRow(long Id, string RunNo, long IRunNo, string? ParentNo, string? Comment, long KeyRun, long? ObsRecs, long? Individuals,
         string? StartDateTime, string? StopDateTime, double? TotalCpuTime, double? PostElapsedTime, double? FinalOutputElapsedTime);
 
-    private sealed record EstimationRow(long Id, long Number, string? Method, double? Ofv, double? DOfv, double? ConditionNumber, double? EstimationTime, double? CovarianceTime);
+    private sealed record EstimationRow(long Id, long Number, string? Method, double? Ofv, double? DOfv, double? ConditionNumber, double? EstimationTime, double? CovarianceTime, string? CovarianceJson, string? CorrelationJson);
+
+    // Matrices are stored as JSON (read/displayed whole, never queried per-element).
+    private static readonly JsonSerializerOptions MatrixJsonOptions = new();
+
+    private sealed record MatrixDto(List<string> Labels, List<List<double?>> Values);
+
+    private static string? SerializeMatrix(NamedMatrix? matrix)
+    {
+        if (matrix is null)
+        {
+            return null;
+        }
+
+        var dto = new MatrixDto(
+            matrix.Labels.ToList(),
+            matrix.Values.Select(row => row.ToList()).ToList());
+        return JsonSerializer.Serialize(dto, MatrixJsonOptions);
+    }
+
+    private static NamedMatrix? DeserializeMatrix(string? json)
+    {
+        if (string.IsNullOrEmpty(json))
+        {
+            return null;
+        }
+
+        var dto = JsonSerializer.Deserialize<MatrixDto>(json, MatrixJsonOptions);
+        if (dto is null)
+        {
+            return null;
+        }
+
+        return new NamedMatrix
+        {
+            Labels = dto.Labels,
+            Values = dto.Values.Select(row => (IReadOnlyList<double?>)row).ToList(),
+        };
+    }
 
     private sealed record ParameterRow(string Kind, long Index, string? Label, double? Estimate, double? StandardError, double? Shrinkage);
 }
