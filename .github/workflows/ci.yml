@@ -96,9 +96,16 @@ jobs:
           cp release-assets/census-linux-x64/app/Census.App    flat/Census.App-linux-x64      || true
           chmod +x flat/census-osx-* flat/census-linux-* flat/Census.App-osx-* flat/Census.App-linux-* 2>/dev/null || true
           ls -lh flat/
+      - name: Generate checksums
+        run: |
+          cd flat
+          sha256sum * > checksums.txt
+          cat checksums.txt
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: false
           generate_release_notes: true
-          files: flat/*
+          files: |
+            flat/*
+            flat/checksums.txt
