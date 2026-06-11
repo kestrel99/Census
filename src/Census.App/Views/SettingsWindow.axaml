@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Census.App.ViewModels"
+        x:Class="Census.App.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="Settings"
+        Width="480" Height="320"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+      <Button Content="Save" Command="{Binding SaveCommand}" IsDefault="True" />
+      <Button Content="Close" IsCancel="True" />
+    </StackPanel>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="120,*" RowSpacing="8">
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="NONMEM path:" VerticalAlignment="Center"/>
+      <TextBox   Grid.Row="0" Grid.Column="1" Text="{Binding NonmemPath}" />
+
+      <TextBlock Grid.Row="1" Grid.Column="0" Text="PsN path:" VerticalAlignment="Center"/>
+      <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding PsnPath}" />
+
+      <TextBlock Grid.Row="2" Grid.Column="0" Text="Perl path:" VerticalAlignment="Center"/>
+      <TextBox   Grid.Row="2" Grid.Column="1" Text="{Binding PerlPath}" />
+
+      <TextBlock Grid.Row="3" Grid.Column="0" Text="R path:" VerticalAlignment="Center"/>
+      <TextBox   Grid.Row="3" Grid.Column="1" Text="{Binding RPath}" />
+
+      <TextBlock Grid.Row="4" Grid.Column="0" Text="Grid font size:" VerticalAlignment="Center"/>
+      <NumericUpDown Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Width="120"
+                     Minimum="8" Maximum="24" Increment="1" FormatString="0"
+                     Value="{Binding GridFontSize}" />
+    </Grid>
+  </DockPanel>
+
+</Window>

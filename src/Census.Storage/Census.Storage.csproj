@@ -6,8 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" />
-    <PackageReference Include="dbup-sqlite" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\*.sql" />
   </ItemGroup>
 
 </Project>

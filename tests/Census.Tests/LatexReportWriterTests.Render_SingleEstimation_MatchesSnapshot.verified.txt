@@ -1,0 +1,32 @@
+﻿\documentclass[12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{longtable}
+\usepackage{booktabs}
+\begin{document}
+
+\section*{Run 27}
+Observations: 1234, Individuals: 56\\
+
+
+\subsection*{Estimation 1 (FOCEI)}
+OFV: -1234.57, Condition number: 20\\
+
+
+\begin{itemize}
+\end{itemize}
+
+
+\begin{longtable}{llrrrrl}
+\toprule
+No. & Parameter & Estimate & S.E. & \%RSE & 95\% CI & Shrinkage (\%) \\
+\midrule
+\endhead
+THETA1 & CL & 3.21 & 0.05 & 1.558 & 3.112--3.308 &  \\
+THETA2 & V & 15.4 & 0.8 & 5.195 & 13.83--16.97 &  \\
+OMEGA1 &  & 0.09 & 0.01 & 11.11 & 0.0704--0.1096 & 12.3 \\
+SIGMA1 &  & 0.04 & 0.005 & 12.5 & 0.0302--0.0498 & 5.6 \\
+\bottomrule
+\end{longtable}
+
+
+\end{document}

@@ -21,7 +21,6 @@
     <!-- Run tree uses the built-in free TreeView. Avalonia.Controls.TreeDataGrid is a
          commercial (Avalonia Accelerate) control and is intentionally not used. -->
     <PackageReference Include="Avalonia.Desktop" />
-    <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
   </ItemGroup>
