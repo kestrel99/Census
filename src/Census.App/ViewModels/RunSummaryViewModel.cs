@@ -1,3 +1,4 @@
+using Avalonia.Media;
 using Census.Domain;
 
 namespace Census.App.ViewModels;
@@ -13,6 +14,7 @@ public sealed class RunSummaryViewModel
         var lastEst = run.Estimations.Count > 0 ? run.Estimations[^1] : null;
         RunNo = run.RunNo;
         ParentNo = run.ParentNo ?? string.Empty;
+        Comment = run.Comment ?? string.Empty;
         Method = lastEst?.Method ?? string.Empty;
         Ofv = lastEst?.Ofv?.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
 
@@ -40,6 +42,7 @@ public sealed class RunSummaryViewModel
 
     public string RunNo { get; }
     public string ParentNo { get; }
+    public string Comment { get; }
     public string Method { get; }
     public string Ofv { get; }
     public string DOfv { get; }
@@ -49,4 +52,13 @@ public sealed class RunSummaryViewModel
     public bool KeyRun { get; }
     public int WarningCount { get; }
     public string Warnings => WarningCount > 0 ? WarningCount.ToString() : string.Empty;
+
+    /// <summary>Status circle in the run list: green = key run, red = has warnings, else none.</summary>
+    public IBrush FlagBrush => KeyRun
+        ? Brushes.MediumSeaGreen
+        : WarningCount > 0 ? Brushes.IndianRed : Brushes.Transparent;
+
+    /// <summary>dOFV is shown in red when it is non-zero (matches the original Census UI).</summary>
+    public IBrush DOfvBrush =>
+        DOfv.StartsWith('+') || DOfv.StartsWith('-') ? Brushes.Firebrick : Brushes.Black;
 }

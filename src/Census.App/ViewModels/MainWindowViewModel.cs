@@ -30,8 +30,10 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Title))]
     [NotifyPropertyChangedFor(nameof(IsProjectOpen))]
+    [NotifyPropertyChangedFor(nameof(ConnectionStatus))]
     [NotifyCanExecuteChangedFor(nameof(ImportRunCommand))]
     [NotifyCanExecuteChangedFor(nameof(ImportFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CompareCommand))]
     private string? _projectPath;
 
     [ObservableProperty]
@@ -41,8 +43,19 @@ public partial class MainWindowViewModel : ObservableObject
     private ObservableCollection<RunSummaryViewModel> _runs = [];
 
     [ObservableProperty]
+    private ObservableCollection<RunTreeNode> _runTree = [];
+
+    [ObservableProperty]
+    private RunTreeNode? _selectedTreeNode;
+
+    [ObservableProperty]
+    private bool _treeExpanded = true;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExportRunCommand))]
     [NotifyCanExecuteChangedFor(nameof(ArchiveRunCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteRunCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DiagnosticsCommand))]
     private RunSummaryViewModel? _selectedRun;
 
     [ObservableProperty]
@@ -53,12 +66,29 @@ public partial class MainWindowViewModel : ObservableObject
         RunDetail = value is not null ? new RunDetailViewModel(value.Model) : null;
     }
 
+    partial void OnSelectedTreeNodeChanged(RunTreeNode? value)
+    {
+        if (value?.Run is not null)
+            SelectedRun = value.Run;
+    }
+
+    partial void OnTreeExpandedChanged(bool value)
+    {
+        foreach (var node in RunTree)
+            node.IsExpanded = value;
+    }
+
     public bool IsProjectOpen => ProjectPath is not null;
     public bool IsRunSelected => SelectedRun is not null;
 
     public string Title => ProjectPath is not null
         ? $"Census — {Path.GetFileName(ProjectPath)}"
         : "Census";
+
+    public string ConnectionStatus => ProjectPath is not null
+        ? $"Connected – {ProjectPath}"
+        : "Not connected";
+
     public string StatusText { get; private set; } = "No project open";
 
     private void UpdateStatusText(string text)
@@ -74,10 +104,9 @@ public partial class MainWindowViewModel : ObservableObject
         if (path is null) return;
         _store.Create(path);
         ProjectPath = path;
-        Runs.Clear();
+        RefreshRuns();
         _settings.AddRecentProject(path);
         RefreshRecentProjects();
-        UpdateStatusText($"0 runs | {Path.GetFileName(path)}");
     }
 
     [RelayCommand]
@@ -91,8 +120,10 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void CloseProject()
     {
+        SelectedRun = null;
         ProjectPath = null;
         Runs.Clear();
+        RunTree = [];
         UpdateStatusText("No project open");
     }
 
@@ -135,6 +166,25 @@ public partial class MainWindowViewModel : ObservableObject
         if (imported > 0) RefreshRuns();
         UpdateStatusText($"Imported {imported} of {files.Count} XML files.");
     }
+
+    [RelayCommand(CanExecute = nameof(IsRunSelected))]
+    private void DeleteRun()
+    {
+        if (SelectedRun is null) return;
+        var runNo = SelectedRun.RunNo;
+        _store.DeleteRun(runNo);
+        SelectedRun = null;
+        RefreshRuns();
+        UpdateStatusText($"Deleted run {runNo}.");
+    }
+
+    [RelayCommand(CanExecute = nameof(IsProjectOpen))]
+    private void Compare() =>
+        UpdateStatusText("Compare: use the run list to review runs side by side (full compare view is planned).");
+
+    [RelayCommand(CanExecute = nameof(IsRunSelected))]
+    private void Diagnostics() =>
+        UpdateStatusText("Diagnostics view is planned.");
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]
     private async Task ExportRunAsync()
@@ -219,8 +269,20 @@ public partial class MainWindowViewModel : ObservableObject
         Runs = new ObservableCollection<RunSummaryViewModel>(
             all.Select(r => new RunSummaryViewModel(r, byRunNo)));
         OnPropertyChanged(nameof(Runs));
+        RebuildRunTree();
         UpdateStatusText(ProjectPath is not null
             ? $"{Runs.Count} run{(Runs.Count == 1 ? "" : "s")} | {Path.GetFileName(ProjectPath)}"
             : "No project open");
+    }
+
+    private void RebuildRunTree()
+    {
+        var root = new RunTreeNode("All runs", null) { IsExpanded = TreeExpanded };
+        foreach (var run in Runs)
+        {
+            var label = string.IsNullOrEmpty(run.Comment) ? run.RunNo : $"{run.RunNo}  —  {run.Comment}";
+            root.Children.Add(new RunTreeNode(label, run));
+        }
+        RunTree = [root];
     }
 }

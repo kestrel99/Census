@@ -1,50 +1,42 @@
-using Census.Domain;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using Census.Domain;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Census.App.ViewModels;
 
-public sealed class RunDetailViewModel
+/// <summary>
+/// Drives the bottom region of the main window: the "Estimation" steps grid on the
+/// left and the parameter tabs (theta/omega/sigma/…) on the right, which follow the
+/// currently selected estimation step.
+/// </summary>
+public sealed partial class RunDetailViewModel : ObservableObject
 {
     public RunDetailViewModel(Run run)
     {
         RunNo = run.RunNo;
+        ParentNo = run.ParentNo ?? string.Empty;
+        Comment = run.Comment ?? string.Empty;
+        ObsRecs = run.ObsRecs?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+        Individuals = run.Individuals?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+        FileCount = run.Files.Count.ToString(CultureInfo.InvariantCulture);
 
-        var lastEst = run.Estimations.Count > 0 ? run.Estimations[^1] : null;
+        Estimations = new ObservableCollection<EstimationStepViewModel>(
+            run.Estimations.Select(e => new EstimationStepViewModel(e)));
 
-        Method          = lastEst?.Method ?? string.Empty;
-        Ofv             = lastEst?.Ofv?.ToString("0.000", CultureInfo.InvariantCulture) ?? string.Empty;
-        ConditionNumber = lastEst?.ConditionNumber?.ToString("0", CultureInfo.InvariantCulture) ?? string.Empty;
-        ObsRecs         = run.ObsRecs?.ToString() ?? string.Empty;
-        Individuals     = run.Individuals?.ToString() ?? string.Empty;
-
-        Warnings = lastEst?.Warnings ?? [];
-
-        var parameters  = lastEst?.Parameters ?? [];
-        Thetas  = parameters.Where(p => p.Kind == ParameterKind.Theta).Select(p => new ParameterRowViewModel(p)).ToList();
-        Omegas  = parameters.Where(p => p.Kind == ParameterKind.Omega).Select(p => new ParameterRowViewModel(p)).ToList();
-        Sigmas  = parameters.Where(p => p.Kind == ParameterKind.Sigma).Select(p => new ParameterRowViewModel(p)).ToList();
-
-        AllParameters = parameters.Select(p => new ParameterRowViewModel(p)).ToList();
-
-        EstimationCount = run.Estimations.Count;
-        HasMultipleEstimations = run.Estimations.Count > 1;
+        // Default to the final estimation step, as the original UI does.
+        SelectedEstimation = Estimations.Count > 0 ? Estimations[^1] : null;
     }
 
-    public string RunNo             { get; }
-    public string Method            { get; }
-    public string Ofv               { get; }
-    public string ConditionNumber   { get; }
-    public string ObsRecs           { get; }
-    public string Individuals       { get; }
-    public IReadOnlyList<string>               Warnings      { get; }
-    public IReadOnlyList<ParameterRowViewModel> Thetas        { get; }
-    public IReadOnlyList<ParameterRowViewModel> Omegas        { get; }
-    public IReadOnlyList<ParameterRowViewModel> Sigmas        { get; }
-    public IReadOnlyList<ParameterRowViewModel> AllParameters { get; }
-    public int  EstimationCount        { get; }
-    public bool HasMultipleEstimations { get; }
-    public bool HasWarnings            => Warnings.Count > 0;
-    public bool HasThetas              => Thetas.Count > 0;
-    public bool HasOmegas              => Omegas.Count > 0;
-    public bool HasSigmas              => Sigmas.Count > 0;
+    public string RunNo { get; }
+    public string ParentNo { get; }
+    public string Comment { get; }
+    public string ObsRecs { get; }
+    public string Individuals { get; }
+    public string FileCount { get; }
+
+    public ObservableCollection<EstimationStepViewModel> Estimations { get; }
+
+    [ObservableProperty]
+    private EstimationStepViewModel? _selectedEstimation;
 }

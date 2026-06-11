@@ -1,0 +1,327 @@
+<!ELEMENT nm:output ( nm:start_datetime | nm:control_stream | nm:nmtran | nm:nonmem | nm:stop_datetime  | nm:total_cputime )*>
+<!ATTLIST nm:output xmlns:nm CDATA #IMPLIED xmlns:xsi CDATA #IMPLIED xsi:schemaLocation CDATA #IMPLIED>
+<!ELEMENT nm:start_datetime (#PCDATA)>
+<!ELEMENT nm:stop_datetime (#PCDATA)>
+<!ELEMENT nm:total_cputime (#PCDATA)>
+<!ELEMENT nm:control_stream (#PCDATA)>
+<!ELEMENT nm:nmtran (#PCDATA)>
+<!ELEMENT nm:nonmem (nm:problem | nm:license_information | nm:program_information  | nm:theta_lb | nm:theta_in | nm:theta_ub 
+ | nm:olkjdf | nm:ovarf | nm:slkjdf | nm:svarf | nm:ttdf  )*>
+<!ATTLIST nm:nonmem nm:version CDATA #IMPLIED>
+<!ELEMENT nm:license_information (#PCDATA)>
+<!ELEMENT nm:program_information (#PCDATA)>
+<!ELEMENT nm:problem (nm:problem_title | nm:problem_information | nm:problem_options 
+ | nm:theta_lb | nm:theta_in | nm:theta_ub | nm:chain_record 
+ | nm:parallel_chain_record  | nm:parallel_sim 
+ | nm:simulation_information | nm:sim_info | nm:sim_elapsed_time | nm:estimation | nm:table | nm:scatter | nm:post_process_times
+ | nm:parallel_sir | nm:sir_estimation | nm:parallel_wres  | nm:parallel_fnleta )*>
+<!ATTLIST nm:problem nm:number CDATA #IMPLIED nm:subproblem CDATA  #IMPLIED nm:superproblem1 CDATA  #IMPLIED nm:iteration1 CDATA  #IMPLIED nm:superproblem2 CDATA  #IMPLIED nm:iteration2 CDATA #IMPLIED >
+<!ELEMENT nm:post_process_times (nm:post_elapsed_time | nm:finaloutput_elapsed_time )*>
+<!ELEMENT nm:problem_title (#PCDATA)>
+<!ELEMENT nm:problem_information (#PCDATA)>
+<!ELEMENT nm:problem_options EMPTY>
+<!ATTLIST nm:problem_options nm:data_checkout_run CDATA #IMPLIED nm:data_previous CDATA #IMPLIED nm:data_unit CDATA #IMPLIED
+ nm:data_rewind CDATA #IMPLIED  nm:data_fdatacsv CDATA #IMPLIED nm:data_nrec CDATA #IMPLIED nm:data_nitems CDATA #IMPLIED nm:data_id CDATA #IMPLIED
+ nm:data_l2 CDATA #IMPLIED nm:data_dv CDATA #IMPLIED nm:data_mdv CDATA #IMPLIED nm:data_mrg CDATA #IMPLIED
+ nm:data_raw CDATA #IMPLIED nm:data_rpt CDATA #IMPLIED nm:data_sub_array1 CDATA #IMPLIED nm:data_sub_array2 CDATA #IMPLIED
+ nm:data_sub_array3 CDATA #IMPLIED nm:data_pred_indices CDATA #IMPLIED nm:data_format CDATA #IMPLIED  nm:data_spcformat CDATA #IMPLIED
+ nm:data_nobs CDATA #IMPLIED nm:data_nind CDATA #IMPLIED nm:data_mdv100 CDATA #IMPLIED nm:msfi_rescaled CDATA #IMPLIED nm:nthetat CDATA #IMPLIED
+ nm:theta_bound_test_omitted CDATA #IMPLIED 
+ nm:omega_diagdim CDATA #IMPLIED nm:omega_bound_test_omitted CDATA #IMPLIED nm:omega_blockdim CDATA #IMPLIED
+ nm:sigma_diagdim CDATA #IMPLIED nm:sigma_bound_test_omitted CDATA #IMPLIED nm:sigma_blockdim CDATA #IMPLIED
+ nm:nfn_initial CDATA #IMPLIED nm:sim_omitted CDATA #IMPLIED nm:sim_obj_evaluated CDATA #IMPLIED
+ nm:sim_rewind CDATA #IMPLIED nm:sim_with_initial_estimate CDATA #IMPLIED nm:sim_with_final_estimate CDATA #IMPLIED nm:sim_with_prior CDATA #IMPLIED 
+ nm:sim_ranmethod CDATA #IMPLIED nm:sim_supreset CDATA #IMPLIED  nm:sim_clockseed CDATA #IMPLIED
+ nm:sim_newran CDATA #IMPLIED nm:sim_etader_order_max CDATA #IMPLIED 
+ nm:sim_source_eps CDATA #IMPLIED nm:sim_ttdf CDATA #IMPLIED 
+ nm:sim_seed1_01 CDATA #IMPLIED nm:sim_seed2_01 CDATA #IMPLIED nm:sim_dist_01 CDATA #IMPLIED 
+ nm:sim_seed1_02 CDATA #IMPLIED nm:sim_seed2_02 CDATA #IMPLIED nm:sim_dist_02 CDATA #IMPLIED 
+ nm:sim_seed1_03 CDATA #IMPLIED nm:sim_seed2_03 CDATA #IMPLIED nm:sim_dist_03 CDATA #IMPLIED 
+ nm:sim_seed1_04 CDATA #IMPLIED nm:sim_seed2_04 CDATA #IMPLIED nm:sim_dist_04 CDATA #IMPLIED 
+ nm:sim_seed1_05 CDATA #IMPLIED nm:sim_seed2_05 CDATA #IMPLIED nm:sim_dist_05 CDATA #IMPLIED 
+ nm:sim_seed1_06 CDATA #IMPLIED nm:sim_seed2_06 CDATA #IMPLIED nm:sim_dist_06 CDATA #IMPLIED 
+ nm:sim_seed1_07 CDATA #IMPLIED nm:sim_seed2_07 CDATA #IMPLIED nm:sim_dist_07 CDATA #IMPLIED 
+ nm:sim_seed1_08 CDATA #IMPLIED nm:sim_seed2_08 CDATA #IMPLIED nm:sim_dist_08 CDATA #IMPLIED 
+ nm:sim_seed1_09 CDATA #IMPLIED nm:sim_seed2_09 CDATA #IMPLIED nm:sim_dist_09 CDATA #IMPLIED 
+ nm:sim_seed1_10 CDATA #IMPLIED nm:sim_seed2_10 CDATA #IMPLIED nm:sim_dist_10 CDATA #IMPLIED 
+ nm:sim_subprob CDATA #IMPLIED
+ nm:nonpar_omitted CDATA #IMPLIED
+ nm:nonpar_estim CDATA #IMPLIED
+ nm:nonpar_density_recompute CDATA #IMPLIED nm:nonpar_marginal_cum CDATA #IMPLIED nm:nonpar_pop_etas CDATA #IMPLIED
+ nm:nonpar_msfoutput CDATA #IMPLIED nm:nonpar_bootstrap CDATA #IMPLIED nm:nonpar_support_nodes CDATA #IMPLIED
+ nm:nonpar_stratcol CDATA #IMPLIED nm:nonpar_stratfcol CDATA #IMPLIED
+ nm:nonpar_expand CDATA #IMPLIED nm:nonpar_nsuppe CDATA #IMPLIED nm:cov_omitted CDATA #IMPLIED
+ nm:cov_matrix CDATA #IMPLIED nm:cov_rmatrix_print CDATA #IMPLIED
+ nm:cov_smatrix_print CDATA #IMPLIED nm:cov_eigen_print CDATA #IMPLIED nm:cov_special CDATA #IMPLIED nm:cov_compressed CDATA #IMPLIED
+ nm:cov_slow_gradient CDATA #IMPLIED nm:cov_siglocov CDATA #IMPLIED 
+ nm:cov_sirsample CDATA #IMPLIED  nm:cov_sirniter CDATA #IMPLIED  nm:cov_sircenter CDATA #IMPLIED
+ nm:cov_capcorr CDATA #IMPLIED  nm:cov_sirminwt CDATA #IMPLIED  nm:cov_sirmaxwt CDATA #IMPLIED
+ nm:cov_iaccept CDATA #IMPLIED nm:cov_iacceptl CDATA #IMPLIED nm:cov_df CDATA #IMPLIED
+ nm:cov_pfcond CDATA #IMPLIED  nm:cov_precond CDATA #IMPLIED   nm:cov_pretype CDATA #IMPLIED  nm:cov_fposdef CDATA #IMPLIED 
+ nm:cov_posdef CDATA #IMPLIED 
+ nm:cov_thbnd CDATA #IMPLIED  nm:cov_sirthbnd CDATA #IMPLIED  nm:cov_preconds CDATA #IMPLIED 
+ nm:cov_file CDATA #IMPLIED nm:cov_format CDATA #IMPLIED nm:cov_print CDATA #IMPLIED nm:cov_seed CDATA #IMPLIED 
+ nm:cov_clockseed CDATA #IMPLIED nm:cov_ranmethod CDATA #IMPLIED
+ nm:cov_siglcov CDATA #IMPLIED nm:cov_tol CDATA #IMPLIED
+ nm:cov_atol CDATA #IMPLIED nm:cov_nofcov CDATA #IMPLIED nm:cov_resume CDATA #IMPLIED nm:tab_omitted CDATA #IMPLIED
+ nm:cov_knuthsumoff CDATA #IMPLIED nm:cov_cholroff CDATA #IMPLIED
+ nm:tab_number CDATA #IMPLIED nm:tab_seed CDATA #IMPLIED
+ nm:tab_clockseed CDATA #IMPLIED nm:tab_npdtype CDATA #IMPLIED nm:tab_interptype CDATA #IMPLIED
+ nm:tab_ranmethod CDATA #IMPLIED nm:tab_esample CDATA #IMPLIED
+ nm:tab_fixedetas_01 CDATA #IMPLIED  nm:tab_fixedetas_02 CDATA #IMPLIED  nm:tab_fixedetas_03 CDATA #IMPLIED 
+ nm:tab_fixedetas_04 CDATA #IMPLIED  nm:tab_fixedetas_05 CDATA #IMPLIED  nm:tab_fixedetas_06 CDATA #IMPLIED 
+ nm:tab_fixedetas_07 CDATA #IMPLIED  nm:tab_fixedetas_08 CDATA #IMPLIED  nm:tab_fixedetas_09 CDATA #IMPLIED 
+ nm:tab_fixedetas_10 CDATA #IMPLIED 
+ nm:tab_wres CDATA #IMPLIED nm:scatter_omitted CDATA #IMPLIED nm:scatter_number CDATA #IMPLIED
+ nm:pred_advan CDATA #IMPLIED nm:pred_evid CDATA #IMPLIED nm:pred_time CDATA #IMPLIED nm:pred_amt CDATA #IMPLIED
+ nm:pred_rate CDATA #IMPLIED nm:pred_ss CDATA #IMPLIED nm:pred_ii CDATA #IMPLIED nm:pred_addl CDATA #IMPLIED
+ nm:pred_cmt CDATA #IMPLIED nm:pred_pcmt CDATA #IMPLIED nm:pred_call CDATA #IMPLIED nm:pred_cont CDATA #IMPLIED>
+<!ELEMENT nm:olkjdf (nm:val)*>
+<!ELEMENT nm:ovarf (nm:val)*>
+<!ELEMENT nm:slkjdf (nm:val)*>
+<!ELEMENT nm:svarf (nm:val)*>
+<!ELEMENT nm:ttdf (nm:val)*>
+<!ELEMENT nm:theta_lb (nm:val)*>
+<!ELEMENT nm:theta_in (nm:val)*>
+<!ELEMENT nm:theta_ub (nm:val)*>
+<!ELEMENT nm:chain_record (nm:chain_record_information | nm:chain_record_options)*>
+<!ELEMENT nm:chain_record_information (#PCDATA)>
+<!ELEMENT nm:chain_record_options EMPTY>
+<!ATTLIST nm:chain_record_options
+ nm:notitle CDATA #IMPLIED nm:nolabel CDATA #IMPLIED
+ nm:format CDATA #IMPLIED
+ nm:order CDATA #IMPLIED nm:ctype CDATA #IMPLIED  
+ nm:seed CDATA #IMPLIED nm:clockseed CDATA #IMPLIED
+ nm:nsample CDATA #IMPLIED  nm:select CDATA #IMPLIED  nm:file CDATA #IMPLIED  nm:dfs CDATA #IMPLIED 
+ nm:isample CDATA #IMPLIED nm:isampend CDATA #IMPLIED nm:ranmethod CDATA #IMPLIED
+ nm:iaccept CDATA #IMPLIED nm:df CDATA #IMPLIED>
+<!ELEMENT nm:simulation_information (#PCDATA)>
+<!ELEMENT nm:sim_elapsed_time (#PCDATA)>
+<!ELEMENT nm:sim_info EMPTY>
+<!ATTLIST nm:sim_info nm:superproblem1 CDATA #IMPLIED nm:iteration1 CDATA #IMPLIED nm:superproblem2 CDATA #IMPLIED
+ nm:iteration2 CDATA #IMPLIED nm:problem CDATA #IMPLIED nm:subproblem CDATA #IMPLIED
+ nm:sim_bootstrap CDATA #IMPLIED  nm:sim_bootstrap_replace CDATA #IMPLIED  nm:sim_stratcol CDATA #IMPLIED  nm:sim_stratfcol CDATA #IMPLIED 
+ nm:sim_seed1_01 CDATA #IMPLIED nm:sim_seed2_01 CDATA #IMPLIED 
+ nm:sim_seed1_02 CDATA #IMPLIED nm:sim_seed2_02 CDATA #IMPLIED 
+ nm:sim_seed1_03 CDATA #IMPLIED nm:sim_seed2_03 CDATA #IMPLIED 
+ nm:sim_seed1_04 CDATA #IMPLIED nm:sim_seed2_04 CDATA #IMPLIED 
+ nm:sim_seed1_05 CDATA #IMPLIED nm:sim_seed2_05 CDATA #IMPLIED 
+ nm:sim_seed1_06 CDATA #IMPLIED nm:sim_seed2_06 CDATA #IMPLIED 
+ nm:sim_seed1_07 CDATA #IMPLIED nm:sim_seed2_07 CDATA #IMPLIED 
+ nm:sim_seed1_08 CDATA #IMPLIED nm:sim_seed2_08 CDATA #IMPLIED 
+ nm:sim_seed1_09 CDATA #IMPLIED nm:sim_seed2_09 CDATA #IMPLIED 
+ nm:sim_seed1_10 CDATA #IMPLIED nm:sim_seed2_10 CDATA #IMPLIED>
+<!ELEMENT nm:parallel_chain_record EMPTY>
+<!ATTLIST nm:parallel_chain_record nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:parallel_sim EMPTY>
+<!ATTLIST nm:parallel_sim nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:estimation ( nm:parallel_chain_est | nm:parallel_est | nm:table_series 
+          | nm:estimation_method | nm:estimation_title | nm:estimation_information | nm:estimation_options 
+          | nm:monitor | nm:estimation_burnin_time | nm:estimation_elapsed_time | nm:optd_elapsed_time | nm:parallel_cov 
+          | nm:parallel_fnleta | nm:parallel_nonpar | nm:parallel_nonparo
+          | nm:nonpar_elapsed_time | nm:nonpar_elapsed_timeb | nm:parallel_wres
+          | nm:termination_status 
+          | nm:termination_nfuncevals | nm:termination_sigdigits | nm:termination_information | nm:termination_txtmsg 
+          | nm:etabar | nm:etabarse | nm:etabarpval | nm:etashrinksd | nm:ebvshrinksd 
+          | nm:etabarn | nm:etashrinkvr | nm:ebvshrinkvr | nm:relativeinf 
+          | nm:epsshrinksd | nm:epsshrinkvr | nm:covariance_information | nm:covariance_status | nm:covariance_elapsed_time
+          | nm:final_objective_function_text | nm:final_objective_function | nm:final_objective_function_std 
+          | nm:cnv_objective_function | nm:cnv_objective_function_std 
+          | nm:theta | nm:omega | nm:sigma | nm:omegac | nm:sigmac | nm:thetase | nm:omegase | nm:sigmase
+          | nm:omegacse | nm:sigmacse | nm:covariance | nm:correlation | nm:invcovariance | nm:eigenvalues | nm:np_objective_function
+          | nm:rmatrix | nm:smatrix | nm:thetanp | nm:exnpeta |  nm:covnpeta | nm:covnpetac | nm:omeganp | nm:omeganpc )*>
+<!ATTLIST nm:estimation nm:number CDATA  #IMPLIED nm:type CDATA  #IMPLIED>
+<!ELEMENT nm:sir_estimation ( nm:table_series | nm:estimation_method | nm:estimation_title | nm:monitor 
+          | nm:estimation_elapsed_time | nm:termination_status | nm:termination_information 
+          | nm:final_objective_function_text | nm:final_objective_function | nm:final_objective_function_std 
+          | nm:cnv_objective_function | nm:cnv_objective_function_std 
+          | nm:theta | nm:omega | nm:sigma | nm:omegac | nm:sigmac | nm:thetase | nm:omegase | nm:sigmase
+          | nm:omegacse | nm:sigmacse | nm:covariance | nm:correlation | nm:invcovariance | nm:eigenvalues 
+          | nm:rmatrix | nm:smatrix )*>
+<!ATTLIST nm:sir_estimation nm:number CDATA  #IMPLIED nm:type CDATA  #IMPLIED>
+<!ELEMENT nm:parallel_chain_est EMPTY>
+<!ATTLIST nm:parallel_chain_est nm:parafile CDATA #IMPLIED nm:protocol CDATA #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:parallel_est EMPTY>
+<!ATTLIST nm:parallel_est nm:parafile CDATA #IMPLIED nm:protocol CDATA #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:parallel_sir EMPTY>
+<!ATTLIST nm:parallel_sir nm:parafile CDATA #IMPLIED nm:protocol CDATA #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:table_series (#PCDATA)>
+<!ELEMENT nm:estimation_method (#PCDATA)>
+<!ELEMENT nm:estimation_title (#PCDATA)>
+<!ELEMENT nm:estimation_information (#PCDATA)>
+<!ELEMENT nm:estimation_options EMPTY>
+<!ATTLIST nm:estimation_options nm:estim_omitted CDATA #IMPLIED nm:analysis_type CDATA #IMPLIED nm:posthoc CDATA #IMPLIED
+ nm:saddle_reset CDATA #IMPLIED nm:saddle_hess CDATA #IMPLIED
+ nm:fo_model_app CDATA #IMPLIED nm:slow_gradient CDATA #IMPLIED nm:cond_estim CDATA #IMPLIED nm:etas_fixed_to_zero CDATA #IMPLIED
+ nm:epseta_interaction CDATA #IMPLIED nm:centered_eta CDATA #IMPLIED 
+ nm:laplace CDATA #IMPLIED nm:numerical_2nd_der CDATA #IMPLIED nm:stieltjes CDATA #IMPLIED
+ nm:nfractiles CDATA #IMPLIED nm:ndirections CDATA #IMPLIED nm:leftpoint CDATA #IMPLIED
+ nm:rightpoint CDATA #IMPLIED nm:predflag CDATA #IMPLIED nm:maxfn CDATA #IMPLIED
+ nm:nsig CDATA #IMPLIED nm:msfo CDATA #IMPLIED nm:conv_repeat CDATA #IMPLIED nm:conv_repeat1 CDATA #IMPLIED
+ nm:conv_repeat2 CDATA #IMPLIED nm:abort CDATA #IMPLIED nm:objsort CDATA #IMPLIED 
+ nm:numder CDATA #IMPLIED nm:optmap CDATA #IMPLIED nm:etader CDATA #IMPLIED nm:mceta CDATA #IMPLIED
+ nm:siglo CDATA #IMPLIED nm:sigl CDATA #IMPLIED nm:notitle CDATA #IMPLIED nm:nolabel CDATA #IMPLIED
+ nm:noprior CDATA #IMPLIED nm:nocov CDATA #IMPLIED nm:dercont CDATA #IMPLIED nm:atol CDATA #IMPLIED
+ nm:fnleta CDATA #IMPLIED nm:etastype CDATA #IMPLIED nm:noninfeta CDATA #IMPLIED nm:format CDATA #IMPLIED
+ nm:order CDATA #IMPLIED nm:ctype CDATA #IMPLIED nm:estimation_method CDATA #IMPLIED 
+ nm:mum CDATA #IMPLIED nm:grd CDATA #IMPLIED nm:auto CDATA #IMPLIED
+ nm:cinterval CDATA #IMPLIED nm:citer CDATA #IMPLIED nm:calpha CDATA #IMPLIED nm:thin CDATA #IMPLIED 
+ nm:nburn CDATA #IMPLIED nm:niter CDATA #IMPLIED nm:constrain CDATA #IMPLIED nm:seed CDATA #IMPLIED  nm:clockseed CDATA #IMPLIED
+ nm:level CDATA #IMPLIED  nm:anneal CDATA #IMPLIED 
+ nm:nsample CDATA #IMPLIED  nm:select CDATA #IMPLIED  nm:file CDATA #IMPLIED  nm:dfs CDATA #IMPLIED 
+ nm:isample CDATA #IMPLIED nm:isampend CDATA #IMPLIED nm:ranmethod CDATA #IMPLIED nm:eonly CDATA #IMPLIED
+ nm:iscale_min CDATA #IMPLIED nm:iscale_max CDATA #IMPLIED nm:iaccept CDATA #IMPLIED  nm:iacceptl CDATA #IMPLIED nm:df CDATA #IMPLIED
+ nm:mapiter CDATA #IMPLIED  nm:mapiters CDATA #IMPLIED nm:mapinter CDATA #IMPLIED nm:mapcov CDATA #IMPLIED nm:stdobj CDATA #IMPLIED nm:isample_m1 CDATA #IMPLIED
+ nm:grdq CDATA #IMPLIED nm:nuts_type CDATA #IMPLIED nm:massreset CDATA #IMPLIED nm:nuts_mass CDATA #IMPLIED
+ nm:bionly CDATA #IMPLIED  nm:bootdata CDATA #IMPLIED 
+ nm:kappa CDATA #IMPLIED nm:ikappa CDATA #IMPLIED nm:nuts_gamma CDATA #IMPLIED nm:igamma CDATA #IMPLIED 
+ nm:nuts_stepiter CDATA #IMPLIED nm:nuts_stepinter CDATA #IMPLIED  
+ nm:nuts_delta CDATA #IMPLIED nm:idelta CDATA #IMPLIED nm:madapt CDATA #IMPLIED nm:imadapt CDATA #IMPLIED
+ nm:ttdf CDATA #IMPLIED nm:olkjdf CDATA #IMPLIED  nm:ovarf CDATA #IMPLIED nm:slkjdf CDATA #IMPLIED  nm:svarf CDATA #IMPLIED
+ nm:nuts_transform CDATA #IMPLIED 
+ nm:tpu CDATA #IMPLIED 
+ nm:knuthsumoff CDATA #IMPLIED nm:stepiter CDATA #IMPLIED  nm:stepinter CDATA #IMPLIED nm:nuts_base CDATA #IMPLIED 
+ nm:nuts_test CDATA #IMPLIED  nm:nuts_maxdepth CDATA #IMPLIED nm:nuts_init CDATA #IMPLIED 
+ nm:nuts_term CDATA #IMPLIED nm:wishtype CDATA #IMPLIED  nm:lntwopi CDATA #IMPLIED nm:olntwopi CDATA #IMPLIED 
+ nm:priorc CDATA #IMPLIED
+ nm:inuts_transform CDATA #IMPLIED nm:nuts_eparam CDATA #IMPLIED nm:levwt CDATA #IMPLIED
+ nm:levcenter CDATA #IMPLIED  nm:levobjtype CDATA #IMPLIED nm:evalshrink CDATA #IMPLIED 
+ nm:nuts_oparam CDATA #IMPLIED  nm:nuts_sparam CDATA #IMPLIED 
+ nm:nuts_reg CDATA #IMPLIED nm:nuts_cholbnd CDATA #IMPLIED  
+ nm:isample_m1a CDATA #IMPLIED nm:isample_m1b CDATA #IMPLIED nm:isample_m2 CDATA #IMPLIED nm:isample_m3 CDATA #IMPLIED
+ nm:pscale_min CDATA #IMPLIED
+ nm:pscale_max CDATA #IMPLIED nm:paccept CDATA #IMPLIED nm:psample_m1 CDATA #IMPLIED nm:psample_m2 CDATA #IMPLIED
+ nm:psample_m3 CDATA #IMPLIED nm:oaccept CDATA #IMPLIED nm:osample_m1 CDATA #IMPLIED nm:osample_m2 CDATA #IMPLIED nm:osample_m3 CDATA #IMPLIED
+ nm:optd_groupsize CDATA #IMPLIED 
+ nm:optd_ofvtype CDATA #IMPLIED 
+ nm:optd_ofvdimscaled CDATA #IMPLIED 
+ nm:optd_eopt CDATA #IMPLIED 
+ nm:optd_datasim CDATA #IMPLIED 
+ nm:optd_fimtype CDATA #IMPLIED 
+ nm:optd_varcross CDATA #IMPLIED 
+ nm:optd_mode_assess CDATA #IMPLIED 
+ nm:optd_estimation CDATA #IMPLIED 
+ nm:optd_nmincol CDATA #IMPLIED 
+ nm:optd_nmaxcol CDATA #IMPLIED 
+ nm:optd_stratcol CDATA #IMPLIED 
+ nm:optd_stratfcol CDATA #IMPLIED 
+ nm:optd_seed CDATA #IMPLIED  nm:optd_clockseed CDATA #IMPLIED 
+ nm:optd_deselcol_01 CDATA #IMPLIED 
+ nm:optd_deselstratcol_01 CDATA #IMPLIED 
+ nm:optd_deselmincol_01 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_01 CDATA #IMPLIED 
+ nm:optd_deselcol_02 CDATA #IMPLIED 
+ nm:optd_deselstratcol_02 CDATA #IMPLIED 
+ nm:optd_deselmincol_02 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_02 CDATA #IMPLIED 
+ nm:optd_deselcol_03 CDATA #IMPLIED 
+ nm:optd_deselstratcol_03 CDATA #IMPLIED 
+ nm:optd_deselmincol_03 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_03 CDATA #IMPLIED 
+ nm:optd_deselcol_04 CDATA #IMPLIED 
+ nm:optd_deselstratcol_04 CDATA #IMPLIED 
+ nm:optd_deselmincol_04 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_04 CDATA #IMPLIED 
+ nm:optd_deselcol_05 CDATA #IMPLIED 
+ nm:optd_deselstratcol_05 CDATA #IMPLIED 
+ nm:optd_deselmincol_05 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_05 CDATA #IMPLIED 
+ nm:optd_deselcol_06 CDATA #IMPLIED 
+ nm:optd_deselstratcol_06 CDATA #IMPLIED 
+ nm:optd_deselmincol_06 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_06 CDATA #IMPLIED 
+ nm:optd_deselcol_07 CDATA #IMPLIED 
+ nm:optd_deselstratcol_07 CDATA #IMPLIED 
+ nm:optd_deselmincol_07 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_07 CDATA #IMPLIED 
+ nm:optd_deselcol_08 CDATA #IMPLIED 
+ nm:optd_deselstratcol_08 CDATA #IMPLIED 
+ nm:optd_deselmincol_08 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_08 CDATA #IMPLIED 
+ nm:optd_deselcol_09 CDATA #IMPLIED 
+ nm:optd_deselstratcol_09 CDATA #IMPLIED 
+ nm:optd_deselmincol_09 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_09 CDATA #IMPLIED 
+ nm:optd_deselcol_10 CDATA #IMPLIED 
+ nm:optd_deselstratcol_10 CDATA #IMPLIED 
+ nm:optd_deselmincol_10 CDATA #IMPLIED 
+ nm:optd_deselmaxcol_10 CDATA #IMPLIED 
+>
+<!ELEMENT nm:monitor (nm:obj)*>
+<!ELEMENT nm:estimation_burnin_time (#PCDATA)>
+<!ELEMENT nm:estimation_elapsed_time (#PCDATA)>
+<!ELEMENT nm:optd_elapsed_time (#PCDATA)>
+<!ELEMENT nm:nonpar_elapsed_time (#PCDATA)>
+<!ELEMENT nm:nonpar_elapsed_timeb (#PCDATA)>
+<!ELEMENT nm:termination_status (#PCDATA)>
+<!ELEMENT nm:termination_nfuncevals (#PCDATA)>
+<!ELEMENT nm:termination_sigdigits (#PCDATA)>
+<!ELEMENT nm:termination_information (#PCDATA)>
+<!ELEMENT nm:termination_txtmsg (nm:val)*>
+<!ELEMENT nm:etabar (nm:row)*>
+<!ELEMENT nm:etabarse (nm:row)*>
+<!ELEMENT nm:etabarn (nm:row)*>
+<!ELEMENT nm:etabarpval (nm:row)*>
+<!ELEMENT nm:etashrinksd (nm:row)*>
+<!ELEMENT nm:etashrinkvr (nm:row)*>
+<!ELEMENT nm:ebvshrinksd (nm:row)*>
+<!ELEMENT nm:ebvshrinkvr (nm:row)*>
+<!ELEMENT nm:relativeinf (nm:row)*>
+<!ELEMENT nm:epsshrinksd (nm:row)*>
+<!ELEMENT nm:epsshrinkvr (nm:row)*>
+<!ELEMENT nm:parallel_cov EMPTY>
+<!ELEMENT nm:parallel_wres EMPTY>
+<!ELEMENT nm:post_elapsed_time (#PCDATA)>
+<!ELEMENT nm:finaloutput_elapsed_time (#PCDATA)>
+<!ELEMENT nm:parallel_fnleta EMPTY>
+<!ELEMENT nm:parallel_nonpar EMPTY>
+<!ELEMENT nm:parallel_nonparo EMPTY>
+<!ATTLIST nm:parallel_cov nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ATTLIST nm:parallel_wres nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ATTLIST nm:parallel_fnleta nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ATTLIST nm:parallel_nonpar nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ATTLIST nm:parallel_nonparo nm:parafile CDATA #IMPLIED nm:protocol CDATA  #IMPLIED nm:nodes CDATA #IMPLIED >
+<!ELEMENT nm:covariance_information (#PCDATA)>
+<!ELEMENT nm:covariance_status EMPTY>
+<!ATTLIST nm:covariance_status nm:error CDATA #IMPLIED nm:numnegeigenvalues CDATA  #IMPLIED nm:mineigenvalue CDATA  #IMPLIED nm:maxeigenvalue CDATA  #IMPLIED nm:rms CDATA #IMPLIED >
+<!ELEMENT nm:covariance_elapsed_time (#PCDATA)>
+<!ELEMENT nm:final_objective_function_text (#PCDATA)>
+<!ELEMENT nm:final_objective_function (#PCDATA)>
+<!ELEMENT nm:np_objective_function (#PCDATA)>
+<!ELEMENT nm:final_objective_function_std (#PCDATA)>
+<!ELEMENT nm:cnv_objective_function (#PCDATA)>
+<!ELEMENT nm:cnv_objective_function_std (#PCDATA)>
+<!ELEMENT nm:theta (nm:val)*>
+<!ELEMENT nm:omega (nm:row)*>
+<!ELEMENT nm:sigma (nm:row)*>
+<!ELEMENT nm:omegac (nm:row)*>
+<!ELEMENT nm:sigmac (nm:row)*>
+<!ELEMENT nm:omegacse (nm:row)*>
+<!ELEMENT nm:sigmacse (nm:row)*>
+<!ELEMENT nm:thetase (nm:val)*>
+<!ELEMENT nm:omegase (nm:row)*>
+<!ELEMENT nm:sigmase (nm:row)*>
+<!ELEMENT nm:exnpeta (nm:val)*>
+<!ELEMENT nm:thetanp (nm:val)*>
+<!ELEMENT nm:covnpeta (nm:row)*>
+<!ELEMENT nm:covnpetac (nm:row)*>
+<!ELEMENT nm:omeganp (nm:row)*>
+<!ELEMENT nm:omeganpc (nm:row)*>
+<!ELEMENT nm:covariance (nm:row)*>
+<!ELEMENT nm:correlation (nm:row)*>
+<!ELEMENT nm:invcovariance (nm:row)*>
+<!ELEMENT nm:rmatrix (nm:row)*>
+<!ELEMENT nm:smatrix (nm:row)*>
+<!ELEMENT nm:eigenvalues (nm:val)*>
+<!ELEMENT nm:obj (#PCDATA)>
+<!ATTLIST nm:obj nm:iteration CDATA #IMPLIED nm:effective CDATA #IMPLIED nm:sample CDATA  #IMPLIED nm:fitness CDATA #IMPLIED>
+<!ELEMENT nm:val (#PCDATA)>
+<!ATTLIST nm:val nm:name CDATA #IMPLIED>
+<!ELEMENT nm:row (nm:col)*>
+<!ATTLIST nm:row nm:rname CDATA #IMPLIED>
+<!ELEMENT nm:col (#PCDATA)>
+<!ATTLIST nm:col nm:cname CDATA #IMPLIED>
+<!ELEMENT nm:table (nm:row)*>
+<!ATTLIST nm:table nm:number CDATA #IMPLIED>
+<!ELEMENT nm:scatter (#PCDATA)>
+<!ATTLIST nm:scatter nm:number CDATA  #IMPLIED nm:ord CDATA  #IMPLIED nm:abs CDATA #IMPLIED>

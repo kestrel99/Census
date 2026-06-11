@@ -20,4 +20,7 @@ public interface IProjectStore
 
     /// <summary>Load all runs in the project.</summary>
     IReadOnlyList<Run> GetRuns();
+
+    /// <summary>Delete a run (and its estimations, parameters, warnings and file refs) by run number.</summary>
+    void DeleteRun(string runNo);
 }

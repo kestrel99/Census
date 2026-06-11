@@ -174,6 +174,14 @@ public sealed class SqliteProjectStore : IProjectStore
         return runs;
     }
 
+    public void DeleteRun(string runNo)
+    {
+        using var connection = OpenConnection();
+        // Child rows (estimations, parameters, warnings, file_artifacts) are removed
+        // by ON DELETE CASCADE; ForeignKeys=true in the connection string enables it.
+        connection.Execute("DELETE FROM runs WHERE RunNo = @runNo;", new { runNo });
+    }
+
     private SqliteConnection OpenConnection()
     {
         var connection = new SqliteConnection(ConnectionString);

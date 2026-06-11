@@ -4,43 +4,63 @@
         xmlns:views="using:Census.App.Views"
         x:Class="Census.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Width="1100" Height="700" MinWidth="800" MinHeight="500"
+        Width="1180" Height="720" MinWidth="900" MinHeight="540"
         Title="{Binding Title}">
+
+  <Window.Styles>
+    <!-- Toolbar buttons: flat, icon over label -->
+    <Style Selector="Button.tool">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Button.tool:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#D6E4F0" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Button.tool TextBlock.glyph">
+      <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
+      <Setter Property="FontSize" Value="20" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.tool TextBlock.label">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+    <!-- Panel header strip -->
+    <Style Selector="Border.panelHeader">
+      <Setter Property="Background" Value="#E6E6E6" />
+      <Setter Property="BorderBrush" Value="#C8C8C8" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="6,3" />
+    </Style>
+  </Window.Styles>
 
   <DockPanel>
 
-    <!-- Menu -->
+    <!-- Menu (Windows convenience; the toolbar is the primary surface) -->
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_File">
-        <MenuItem Header="_New Project…" Command="{Binding NewProjectCommand}" />
-        <MenuItem Header="_Open Project…" Command="{Binding OpenProjectCommand}" />
-        <MenuItem Header="Recent Projects" ItemsSource="{Binding RecentProjects}">
+        <MenuItem Header="_New Database…" Command="{Binding NewProjectCommand}" />
+        <MenuItem Header="_Open Database…" Command="{Binding OpenProjectCommand}" />
+        <MenuItem Header="Recent" ItemsSource="{Binding RecentProjects}">
           <MenuItem.ItemTemplate>
             <DataTemplate>
-              <MenuItem Header="{Binding}" Command="{Binding $parent[Window].DataContext.OpenRecentProjectCommand}" CommandParameter="{Binding}" />
+              <MenuItem Header="{Binding}"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenRecentProjectCommand}"
+                        CommandParameter="{Binding}" />
             </DataTemplate>
           </MenuItem.ItemTemplate>
         </MenuItem>
         <Separator />
-        <MenuItem Header="_Close Project" Command="{Binding CloseProjectCommand}"
-                  IsEnabled="{Binding IsProjectOpen}" />
-        <Separator />
-        <MenuItem Header="_Import Run…" Command="{Binding ImportRunCommand}" InputGesture="Ctrl+I" />
-        <MenuItem Header="Import _Folder…" Command="{Binding ImportFolderCommand}" />
-        <Separator />
-        <MenuItem Header="_Export Run…" Command="{Binding ExportRunCommand}" InputGesture="Ctrl+E" />
-        <MenuItem Header="_Archive Run…" Command="{Binding ArchiveRunCommand}" />
+        <MenuItem Header="_Close" Command="{Binding CloseProjectCommand}" IsEnabled="{Binding IsProjectOpen}" />
         <Separator />
         <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
       </MenuItem>
-      <MenuItem Header="_Runs" IsEnabled="{Binding IsProjectOpen}">
-        <MenuItem Header="_Import Run…" Command="{Binding ImportRunCommand}" />
-        <MenuItem Header="Import _Folder…" Command="{Binding ImportFolderCommand}" />
-        <Separator />
-        <MenuItem Header="_Compare Runs"  />
-      </MenuItem>
       <MenuItem Header="_Tools">
-        <MenuItem Header="Settings..." Command="{Binding OpenSettingsCommand}" />
+        <MenuItem Header="_Preferences…" Command="{Binding OpenSettingsCommand}" />
       </MenuItem>
       <MenuItem Header="_Help">
         <MenuItem Header="_About Census" />
@@ -48,62 +68,151 @@
     </Menu>
 
     <!-- Toolbar -->
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4"
-                Background="{DynamicResource SystemChromeLowColor}" Height="36">
-      <Button Content="New"    Command="{Binding NewProjectCommand}"   Margin="4,4,0,4" />
-      <Button Content="Open"   Command="{Binding OpenProjectCommand}"  Margin="0,4" />
-      <Separator Width="1" Background="#ccc" Margin="4,6" />
-      <Button Content="Import" Command="{Binding ImportRunCommand}" ToolTip.Tip="Import XML run" Margin="0,4" />
-      <Button Content="Import Folder" Command="{Binding ImportFolderCommand}" ToolTip.Tip="Import all XML runs in folder" Margin="0,4" />
-      <Separator Width="1" Background="#ccc" Margin="4,6" />
-      <Button Content="Export" Command="{Binding ExportRunCommand}" ToolTip.Tip="Export selected run to CSV/HTML/LaTeX" Margin="0,4" />
-      <Button Content="Archive" Command="{Binding ArchiveRunCommand}" ToolTip.Tip="Archive selected run as ZIP" Margin="0,4" />
-    </StackPanel>
+    <Border DockPanel.Dock="Top" Background="#F3F3F3" BorderBrush="#C8C8C8" BorderThickness="0,0,0,1">
+      <StackPanel Orientation="Horizontal" Spacing="2" Margin="4,4">
+        <Button Classes="tool" Command="{Binding NewProjectCommand}" ToolTip.Tip="Create a new database">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE710;" /><TextBlock Classes="label" Text="New Database" /></StackPanel>
+        </Button>
+        <Button Classes="tool" Command="{Binding OpenProjectCommand}" ToolTip.Tip="Open an existing database">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE8E5;" /><TextBlock Classes="label" Text="Open Database" /></StackPanel>
+        </Button>
 
-    <!-- Status bar -->
-    <Border DockPanel.Dock="Bottom" Background="{DynamicResource SystemChromeLowColor}" Height="24">
-      <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Margin="8,0"
-                 FontSize="11" Foreground="{DynamicResource SystemBaseMediumColor}" />
+        <Rectangle Width="1" Fill="#C8C8C8" Margin="4,4" />
+
+        <Button Classes="tool" Command="{Binding ImportRunCommand}" ToolTip.Tip="Import a NONMEM run">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE896;" /><TextBlock Classes="label" Text="Import Run" /></StackPanel>
+        </Button>
+        <Button Classes="tool" Command="{Binding ImportFolderCommand}" ToolTip.Tip="Import all runs in a folder">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE8B7;" /><TextBlock Classes="label" Text="Import Folder" /></StackPanel>
+        </Button>
+        <Button Classes="tool" Command="{Binding DeleteRunCommand}" ToolTip.Tip="Delete the selected run">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE74D;" /><TextBlock Classes="label" Text="Delete Run" /></StackPanel>
+        </Button>
+
+        <Rectangle Width="1" Fill="#C8C8C8" Margin="4,4" />
+
+        <Button Classes="tool" Command="{Binding CompareCommand}" ToolTip.Tip="Compare runs">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE8AB;" /><TextBlock Classes="label" Text="Compare" /></StackPanel>
+        </Button>
+        <Button Classes="tool" Command="{Binding DiagnosticsCommand}" ToolTip.Tip="Run diagnostics">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE9D9;" /><TextBlock Classes="label" Text="Diagnostics" /></StackPanel>
+        </Button>
+        <Button Classes="tool" Command="{Binding ExportRunCommand}" ToolTip.Tip="Export a report for the selected run">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE7C3;" /><TextBlock Classes="label" Text="Report" /></StackPanel>
+        </Button>
+
+        <Rectangle Width="1" Fill="#C8C8C8" Margin="4,4" />
+
+        <Button Classes="tool" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="Preferences">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE713;" /><TextBlock Classes="label" Text="Preferences" /></StackPanel>
+        </Button>
+        <Button Classes="tool" Command="{Binding ExitCommand}" ToolTip.Tip="Quit Census">
+          <StackPanel><TextBlock Classes="glyph" Text="&#xE7E8;" /><TextBlock Classes="label" Text="Quit" /></StackPanel>
+        </Button>
+      </StackPanel>
     </Border>
 
-    <!-- Main content split: run list (top) + detail (bottom) -->
-    <Grid RowDefinitions="3*,4,2*">
+    <!-- Status bar -->
+    <Border DockPanel.Dock="Bottom" Background="#F3F3F3" BorderBrush="#C8C8C8" BorderThickness="0,1,0,0" Height="24">
+      <DockPanel Margin="8,0">
+        <TextBlock DockPanel.Dock="Right" Text="{Binding StatusText}" VerticalAlignment="Center"
+                   FontSize="11" Foreground="#666" />
+        <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" FontSize="11" />
+      </DockPanel>
+    </Border>
 
-      <!-- Run DataGrid -->
-      <DataGrid Grid.Row="0"
-                ItemsSource="{Binding Runs}"
-                SelectedItem="{Binding SelectedRun}"
-                IsReadOnly="True"
-                GridLinesVisibility="Horizontal"
-                CanUserReorderColumns="True"
-                CanUserResizeColumns="True"
-                AutoGenerateColumns="False">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Run"     Binding="{Binding RunNo}"           Width="60"  />
-          <DataGridTextColumn Header="Parent"  Binding="{Binding ParentNo}"        Width="60"  />
-          <DataGridTextColumn Header="Method"  Binding="{Binding Method}"          Width="80"  />
-          <DataGridTextColumn Header="OFV"     Binding="{Binding Ofv}"             Width="100" />
-          <DataGridTextColumn Header="dOFV"    Binding="{Binding DOfv}"            Width="90"  />
-          <DataGridTextColumn Header="Cond#"   Binding="{Binding ConditionNumber}" Width="80"  />
-          <DataGridTextColumn Header="Obs"     Binding="{Binding ObsRecs}"         Width="60"  />
-          <DataGridTextColumn Header="Ind"     Binding="{Binding Individuals}"     Width="50"  />
-          <DataGridCheckBoxColumn Header="Key" Binding="{Binding KeyRun}"          Width="40"  />
-          <DataGridTextColumn Header="Warn"    Binding="{Binding Warnings}"        Width="50"  />
-        </DataGrid.Columns>
-      </DataGrid>
+    <!-- Body: left sidebar | run list + detail -->
+    <Grid ColumnDefinitions="230,4,*">
 
-      <!-- Splitter -->
-      <GridSplitter Grid.Row="1" ResizeDirection="Rows" Background="#ccc"
-                    HorizontalAlignment="Stretch" />
+      <!-- Left sidebar: vertical tab strip + filter tree -->
+      <Grid Grid.Column="0" ColumnDefinitions="22,*" Background="#FAFAFA">
 
-      <!-- Run detail (visible only when a run is selected) -->
-      <ContentControl Grid.Row="2" Content="{Binding RunDetail}">
-        <ContentControl.DataTemplates>
-          <DataTemplate DataType="vm:RunDetailViewModel">
-            <views:RunDetailView />
-          </DataTemplate>
-        </ContentControl.DataTemplates>
-      </ContentControl>
+        <Border Grid.Column="0" Background="#ECECEC" BorderBrush="#C8C8C8" BorderThickness="0,0,1,0">
+          <StackPanel VerticalAlignment="Top" Margin="0,8" Spacing="18">
+            <LayoutTransformControl>
+              <LayoutTransformControl.LayoutTransform><RotateTransform Angle="-90" /></LayoutTransformControl.LayoutTransform>
+              <TextBlock Text="Project Overview" FontSize="11" />
+            </LayoutTransformControl>
+            <LayoutTransformControl>
+              <LayoutTransformControl.LayoutTransform><RotateTransform Angle="-90" /></LayoutTransformControl.LayoutTransform>
+              <TextBlock Text="Run Files" FontSize="11" Foreground="#888" />
+            </LayoutTransformControl>
+          </StackPanel>
+        </Border>
+
+        <DockPanel Grid.Column="1">
+          <Border Classes="panelHeader" DockPanel.Dock="Top">
+            <TextBlock Text="Filter" FontSize="11" FontWeight="SemiBold" />
+          </Border>
+          <CheckBox DockPanel.Dock="Bottom" Content="Expanded" Margin="6,2"
+                    IsChecked="{Binding TreeExpanded}" FontSize="11" />
+          <TreeView ItemsSource="{Binding RunTree}"
+                    SelectedItem="{Binding SelectedTreeNode}"
+                    Background="Transparent">
+            <TreeView.Styles>
+              <Style Selector="TreeViewItem">
+                <Setter Property="IsExpanded" Value="{ReflectionBinding IsExpanded, Mode=TwoWay}" />
+              </Style>
+            </TreeView.Styles>
+            <TreeView.ItemTemplate>
+              <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:RunTreeNode">
+                <TextBlock Text="{Binding Label}" FontSize="12" />
+              </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+          </TreeView>
+        </DockPanel>
+      </Grid>
+
+      <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="#C8C8C8" VerticalAlignment="Stretch" />
+
+      <!-- Right: run list (top) + detail (bottom) -->
+      <Grid Grid.Column="2" RowDefinitions="3*,4,2*">
+
+        <DataGrid Grid.Row="0"
+                  ItemsSource="{Binding Runs}"
+                  SelectedItem="{Binding SelectedRun}"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  CanUserReorderColumns="True"
+                  CanUserResizeColumns="True"
+                  AutoGenerateColumns="False">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Run" Binding="{Binding RunNo}" Width="80" />
+            <DataGridTemplateColumn Header="Flag" Width="44">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:RunSummaryViewModel">
+                  <Ellipse Width="12" Height="12" Fill="{Binding FlagBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn Header="Comment" Binding="{Binding Comment}" Width="240" />
+            <DataGridTextColumn Header="OFV" Binding="{Binding Ofv}" Width="110" />
+            <DataGridTemplateColumn Header="dOFV" Width="90">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:RunSummaryViewModel">
+                  <TextBlock Text="{Binding DOfv}" Foreground="{Binding DOfvBrush}"
+                             Margin="8,0" VerticalAlignment="Center" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn Header="Parent" Binding="{Binding ParentNo}" Width="70" />
+            <DataGridTextColumn Header="Cond No" Binding="{Binding ConditionNumber}" Width="90" />
+            <DataGridTextColumn Header="Warnings" Binding="{Binding Warnings}" Width="*" />
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <GridSplitter Grid.Row="1" ResizeDirection="Rows" Background="#C8C8C8" HorizontalAlignment="Stretch" />
+
+        <ContentControl Grid.Row="2" Content="{Binding RunDetail}">
+          <ContentControl.DataTemplates>
+            <DataTemplate DataType="vm:RunDetailViewModel">
+              <views:RunDetailView />
+            </DataTemplate>
+          </ContentControl.DataTemplates>
+        </ContentControl>
+
+      </Grid>
 
     </Grid>
 
