@@ -23,4 +23,10 @@ public interface IProjectStore
 
     /// <summary>Delete a run (and its estimations, parameters, warnings and file refs) by run number.</summary>
     void DeleteRun(string runNo);
+
+    /// <summary>Set a run's flag colour (0 = unflagged, 1-5 = colour index).</summary>
+    void SetFlag(string runNo, int flag);
+
+    /// <summary>Update a run's editable metadata (parent and comment).</summary>
+    void UpdateRun(string runNo, string? parentNo, string? comment);
 }

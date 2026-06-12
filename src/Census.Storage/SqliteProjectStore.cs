@@ -59,7 +59,7 @@ public sealed class SqliteProjectStore : IProjectStore
                 run.IRunNo,
                 run.ParentNo,
                 run.Comment,
-                KeyRun = run.KeyRun ? 1 : 0,
+                KeyRun = run.Flag,
                 run.ObsRecs,
                 run.Individuals,
                 run.StartDateTime,
@@ -191,7 +191,7 @@ public sealed class SqliteProjectStore : IProjectStore
                 IRunNo = (int)r.IRunNo,
                 ParentNo = r.ParentNo,
                 Comment = r.Comment,
-                KeyRun = r.KeyRun != 0,
+                Flag = (int)r.KeyRun,
                 ObsRecs = (int?)r.ObsRecs,
                 Individuals = (int?)r.Individuals,
                 StartDateTime = r.StartDateTime,
@@ -213,6 +213,22 @@ public sealed class SqliteProjectStore : IProjectStore
         // Child rows (estimations, parameters, warnings, file_artifacts) are removed
         // by ON DELETE CASCADE; ForeignKeys=true in the connection string enables it.
         connection.Execute("DELETE FROM runs WHERE RunNo = @runNo;", new { runNo });
+    }
+
+    public void SetFlag(string runNo, int flag)
+    {
+        using var connection = OpenConnection();
+        connection.Execute(
+            "UPDATE runs SET KeyRun = @flag WHERE RunNo = @runNo;",
+            new { flag, runNo });
+    }
+
+    public void UpdateRun(string runNo, string? parentNo, string? comment)
+    {
+        using var connection = OpenConnection();
+        connection.Execute(
+            "UPDATE runs SET ParentNo = @parentNo, Comment = @comment WHERE RunNo = @runNo;",
+            new { parentNo, comment, runNo });
     }
 
     private SqliteConnection OpenConnection()

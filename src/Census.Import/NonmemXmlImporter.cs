@@ -22,8 +22,125 @@ public sealed class NonmemXmlImporter : IRunImporter
         var md5 = ComputeMd5(sourcePath);
         return run with
         {
-            Files = [new FileArtifact { Role = "output", Path = sourcePath, Md5 = md5 }],
+            Files = DiscoverRelatedFiles(sourcePath, md5, ExtractControlStream(xml)),
         };
+    }
+
+    // Index the run's sibling files by path (control stream, listing, ext/cov/cor/…, tables and
+    // the $DATA dataset). Only paths are recorded — file contents are never copied into the project.
+    private static List<FileArtifact> DiscoverRelatedFiles(string xmlPath, string xmlMd5, string? controlStream)
+    {
+        var fullXml = Path.GetFullPath(xmlPath);
+        var dir = Path.GetDirectoryName(fullXml);
+        var stem = Path.GetFileNameWithoutExtension(xmlPath);
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { fullXml };
+        var files = new List<FileArtifact>
+        {
+            new() { Role = "output", Path = xmlPath, Md5 = xmlMd5 },
+        };
+
+        if (dir is null || !Directory.Exists(dir))
+        {
+            return files;
+        }
+
+        // Same-stem files (run27.*): model, listing, ext, cov, cor, coi, phi, grd, shk, …
+        foreach (var path in Directory.EnumerateFiles(dir, stem + ".*"))
+        {
+            if (seen.Add(Path.GetFullPath(path)))
+                files.Add(new FileArtifact { Role = RoleForExtension(Path.GetExtension(path)), Path = path });
+        }
+
+        // Table files (*tab*) belonging to this run (matched by trailing run number).
+        var runNumber = TrailingNumber(stem);
+        foreach (var path in Directory.EnumerateFiles(dir, "*tab*"))
+        {
+            var full = Path.GetFullPath(path);
+            if (seen.Contains(full))
+                continue;
+
+            var tableNumber = TrailingNumber(Path.GetFileNameWithoutExtension(path));
+            if (runNumber is not null && tableNumber is not null && runNumber != tableNumber)
+                continue;
+
+            seen.Add(full);
+            files.Add(new FileArtifact { Role = "table", Path = path });
+        }
+
+        // Dataset referenced by $DATA in the control stream, resolved relative to the run directory.
+        var dataName = ParseDataFileName(controlStream);
+        if (dataName is not null)
+        {
+            var dataPath = Path.GetFullPath(Path.IsPathRooted(dataName) ? dataName : Path.Combine(dir, dataName));
+            if (File.Exists(dataPath) && seen.Add(dataPath))
+                files.Add(new FileArtifact { Role = "data", Path = dataPath });
+        }
+
+        return files;
+    }
+
+    private static string RoleForExtension(string extWithDot)
+    {
+        var ext = extWithDot.TrimStart('.').ToLowerInvariant();
+        return ext switch
+        {
+            "lst" or "res" => "listing",
+            "ctl" or "mod" => "model",
+            "" => "file",
+            _ => ext,
+        };
+    }
+
+    // Trailing decimal number of a name, e.g. "runR027" -> 27, "sdtab27" -> 27, "sdtab" -> null.
+    private static int? TrailingNumber(string name)
+    {
+        var i = name.Length;
+        while (i > 0 && char.IsDigit(name[i - 1]))
+            i--;
+        return i < name.Length && int.TryParse(name.AsSpan(i), out var n) ? n : null;
+    }
+
+    // First token after $DATA in the control stream (handles quotes and trailing options).
+    private static string? ParseDataFileName(string? controlStream)
+    {
+        if (string.IsNullOrEmpty(controlStream))
+            return null;
+
+        foreach (var raw in controlStream.Split('\n'))
+        {
+            var line = raw.Trim();
+            if (!line.StartsWith("$DATA", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var rest = line[5..].Trim();
+            if (rest.Length == 0)
+                continue;
+
+            if (rest[0] is '"' or '\'')
+            {
+                var quote = rest[0];
+                var end = rest.IndexOf(quote, 1);
+                return end > 1 ? rest[1..end] : rest[1..];
+            }
+
+            var stop = rest.IndexOfAny([' ', '\t']);
+            return stop > 0 ? rest[..stop] : rest;
+        }
+
+        return null;
+    }
+
+    private static string? ExtractControlStream(string xml)
+    {
+        try
+        {
+            return El(XDocument.Parse(xml).Root, "control_stream")?.Value;
+        }
+        catch (System.Xml.XmlException)
+        {
+            return null;
+        }
     }
 
     /// <summary>Parse from an XML string. Exposed for testing without disk I/O.</summary>

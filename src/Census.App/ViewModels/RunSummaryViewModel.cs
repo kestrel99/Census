@@ -36,7 +36,7 @@ public sealed class RunSummaryViewModel
         ConditionNumber = lastEst?.ConditionNumber?.ToString("0", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
         ObsRecs = run.ObsRecs?.ToString() ?? string.Empty;
         Individuals = run.Individuals?.ToString() ?? string.Empty;
-        KeyRun = run.KeyRun;
+        Flag = run.Flag;
         WarningCount = run.Estimations.Sum(e => e.Warnings.Count);
 
         // Run-level timings (apply to the whole run). Show datetimes with a space, not 'T'.
@@ -54,17 +54,26 @@ public sealed class RunSummaryViewModel
     public string ConditionNumber { get; }
     public string ObsRecs { get; }
     public string Individuals { get; }
-    public bool KeyRun { get; }
+    public int Flag { get; }
     public int WarningCount { get; }
     public string Warnings => WarningCount > 0 ? WarningCount.ToString() : string.Empty;
     public string StartDateTime { get; }
     public string StopDateTime { get; }
     public string TotalCpuTime { get; }
 
-    /// <summary>Status circle in the run list: green = key run, red = has warnings, else none.</summary>
-    public IBrush FlagBrush => KeyRun
-        ? Brushes.MediumSeaGreen
-        : WarningCount > 0 ? Brushes.IndianRed : Brushes.Transparent;
+    // Flag colour palette, indexed by Flag (0 = unflagged).
+    private static readonly IBrush[] FlagBrushes =
+    [
+        Brushes.Transparent,    // 0 = none
+        Brushes.IndianRed,      // 1 = red
+        Brushes.Orange,         // 2 = orange
+        Brushes.Gold,           // 3 = yellow
+        Brushes.MediumSeaGreen, // 4 = green
+        Brushes.CornflowerBlue, // 5 = blue
+    ];
+
+    /// <summary>Flag circle colour in the run list, from the user-set flag (0-5).</summary>
+    public IBrush FlagBrush => Flag >= 0 && Flag < FlagBrushes.Length ? FlagBrushes[Flag] : Brushes.Transparent;
 
     /// <summary>dOFV is shown in red when it is non-zero (matches the original Census UI).</summary>
     public IBrush DOfvBrush =>
