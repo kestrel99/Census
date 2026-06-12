@@ -265,6 +265,56 @@ public sealed class NonmemXmlImporterTests
     }
 
     [Fact]
+    public void Import_IndexesSiblingRunFilesByPath()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "census-import-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            File.WriteAllText(Path.Combine(dir, "run1.ctl"), "$PROBLEM\n$DATA data1.csv IGNORE=@\n");
+            File.WriteAllText(Path.Combine(dir, "run1.ext"), "x");
+            File.WriteAllText(Path.Combine(dir, "run1.cov"), "x");
+            File.WriteAllText(Path.Combine(dir, "sdtab1"), "x");
+            File.WriteAllText(Path.Combine(dir, "data1.csv"), "ID,DV\n1,2\n");
+
+            var xml = """
+                <?xml version="1.0"?>
+                <output>
+                  <control_stream>$PROBLEM
+                $DATA data1.csv IGNORE=@</control_stream>
+                  <nonmem version="7.4.0">
+                    <problem number="1">
+                      <estimation number="1">
+                        <estimation_method>FOCEI</estimation_method>
+                        <final_objective_function>-1.0</final_objective_function>
+                      </estimation>
+                    </problem>
+                  </nonmem>
+                </output>
+                """;
+            var xmlPath = Path.Combine(dir, "run1.xml");
+            File.WriteAllText(xmlPath, xml);
+
+            var run = new NonmemXmlImporter().Import(xmlPath);
+            var roles = run.Files.Select(f => f.Role).ToList();
+
+            Assert.Contains("output", roles);   // the .xml itself
+            Assert.Contains("model", roles);     // run1.ctl
+            Assert.Contains("ext", roles);       // run1.ext
+            Assert.Contains("cov", roles);       // run1.cov
+            Assert.Contains("table", roles);     // sdtab1
+            Assert.Contains("data", roles);      // data1.csv via $DATA
+
+            // Paths are recorded; the data file resolves to the sibling csv.
+            Assert.Contains(run.Files, f => f.Role == "data" && f.Path.EndsWith("data1.csv", StringComparison.Ordinal));
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Import_InlineXml_ParsesCovarianceAndCorrelationMatrices()
     {
         var xml = """
