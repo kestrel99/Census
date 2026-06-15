@@ -1,0 +1,63 @@
+﻿== nm73/runR001 ==
+RunNo=001  ObsRecs=·  Individuals=·
+  Est#1 focei  OFV=-4126.11  Cond=1.54304  Warnings=0
+    THETA: [1] est=3.98013 se=0.0990013 shrink=·, [2] est=68.2193 se=1.92952 shrink=·, [3] est=0.199472 se=0.00280475 shrink=·
+    OMEGA: [1] est=0.0715555 se=0.00912816 shrink=1.37216, [2] est=0.0921585 se=0.0122009 shrink=1.46176
+    SIGMA: [1] est=1 se=1E+10 shrink=5.22027
+
+== nm73/runR027 ==
+RunNo=027  ObsRecs=·  Individuals=·
+  Est#1 focei  OFV=-3884.11  Cond=7.62404  Warnings=0
+    THETA: [1] est=-2.8049 se=0.0346756 shrink=·, [2] est=4.21052 se=0.0254578 shrink=·, [3] est=-0.0186547 se=0.0325461 shrink=·, [4] est=0.19989 se=0.00297565 shrink=·
+    OMEGA: [1] est=0.137156 se=0.0154178 shrink=0.71436, [2] est=0.0691401 se=0.0103127 shrink=3.49627, [3] est=0.0973664 se=0.0147176 shrink=11.9151
+    SIGMA: [1] est=1 se=1E+10 shrink=7.31959
+
+== nm73/runR041 ==
+RunNo=041  ObsRecs=·  Individuals=·
+  Est#1 focei  OFV=-9149.77  Cond=·  Warnings=0
+    THETA: [1] est=1645.21 se=· shrink=·, [2] est=679.084 se=· shrink=·, [3] est=73.5096 se=· shrink=·, [4] est=3.92763 se=· shrink=·, [5] est=38.8135 se=· shrink=·, [6] est=0.207723 se=· shrink=·
+    OMEGA: [1] est=0.0299467 se=· shrink=53.0412, [2] est=0.391642 se=· shrink=19.922, [3] est=0.0851259 se=· shrink=7.56416, [4] est=0.0973403 se=· shrink=74.4035, [5] est=0.173094 se=· shrink=31.8525
+    SIGMA: [1] est=1 se=· shrink=2.90329
+
+== nm743/runR001 ==
+RunNo=001  ObsRecs=2276  Individuals=120
+  Est#1 focei  OFV=-4126.11  Cond=1.54323  Warnings=0
+    THETA: [1] est=3.98013 se=0.0989759 shrink=·, [2] est=68.2194 se=1.92949 shrink=·, [3] est=0.199472 se=0.00280475 shrink=·
+    OMEGA: [1] est=0.0715555 se=0.00912817 shrink=1.37216, [2] est=0.0921585 se=0.0122009 shrink=1.46175
+    SIGMA: [1] est=1 se=1E+10 shrink=5.22027
+
+== nm743/runR027 ==
+RunNo=027  ObsRecs=2273  Individuals=120
+  Est#1 focei  OFV=-3884.11  Cond=7.62398  Warnings=0
+    THETA: [1] est=-2.8049 se=0.0346757 shrink=·, [2] est=4.21052 se=0.025458 shrink=·, [3] est=-0.0186547 se=0.032558 shrink=·, [4] est=0.19989 se=0.00297578 shrink=·
+    OMEGA: [1] est=0.137156 se=0.015418 shrink=0.71436, [2] est=0.0691401 se=0.0103124 shrink=3.49627, [3] est=0.0973663 se=0.0147185 shrink=11.9151
+    SIGMA: [1] est=1 se=1E+10 shrink=7.31959
+
+== nm743/runR041 ==
+RunNo=041  ObsRecs=4680  Individuals=120
+  Est#1 focei  OFV=-9149.77  Cond=7.80966E+07  Warnings=0
+    THETA: [1] est=1645.2 se=20799.2 shrink=·, [2] est=679.087 se=13763.4 shrink=·, [3] est=73.5099 se=720.469 shrink=·, [4] est=3.92671 se=22.3167 shrink=·, [5] est=38.8132 se=238.848 shrink=·, [6] est=0.207724 se=0.0243429 shrink=·
+    OMEGA: [1] est=0.0299473 se=0.747419 shrink=53.0411, [2] est=0.391635 se=1.0864 shrink=19.9222, [3] est=0.0851251 se=0.017113 shrink=7.56476, [4] est=0.0973445 se=0.140554 shrink=74.407, [5] est=0.17311 se=0.321824 shrink=31.8539
+    SIGMA: [1] est=1 se=1E+10 shrink=2.90333
+
+== nm750/runR001 ==
+RunNo=001  ObsRecs=2276  Individuals=120
+  Est#1 focei  OFV=-4126.11  Cond=1.54323  Warnings=0
+    THETA: [1] est=3.98013 se=0.0989759 shrink=·, [2] est=68.2194 se=1.92949 shrink=·, [3] est=0.199472 se=0.00280475 shrink=·
+    OMEGA: [1] est=0.0715555 se=0.00912817 shrink=1.37216, [2] est=0.0921585 se=0.0122009 shrink=1.46175
+    SIGMA: [1] est=1 se=1E+10 shrink=5.22027
+
+== nm750/runR027 ==
+RunNo=027  ObsRecs=2273  Individuals=120
+  Est#1 focei  OFV=-3884.11  Cond=7.62398  Warnings=0
+    THETA: [1] est=-2.8049 se=0.0346757 shrink=·, [2] est=4.21052 se=0.025458 shrink=·, [3] est=-0.0186547 se=0.032558 shrink=·, [4] est=0.19989 se=0.00297578 shrink=·
+    OMEGA: [1] est=0.137156 se=0.015418 shrink=0.71436, [2] est=0.0691401 se=0.0103124 shrink=3.49627, [3] est=0.0973663 se=0.0147185 shrink=11.9151
+    SIGMA: [1] est=1 se=1E+10 shrink=7.31959
+
+== nm750/runR041 ==
+RunNo=041  ObsRecs=4680  Individuals=120
+  Est#1 focei  OFV=-9149.77  Cond=·  Warnings=0
+    THETA: [1] est=1645.2 se=· shrink=·, [2] est=679.087 se=· shrink=·, [3] est=73.5099 se=· shrink=·, [4] est=3.92671 se=· shrink=·, [5] est=38.8132 se=· shrink=·, [6] est=0.207724 se=· shrink=·
+    OMEGA: [1] est=0.0299473 se=· shrink=53.0411, [2] est=0.391635 se=· shrink=19.9222, [3] est=0.0851251 se=· shrink=7.56476, [4] est=0.0973445 se=· shrink=74.407, [5] est=0.17311 se=· shrink=31.8539
+    SIGMA: [1] est=1 se=· shrink=2.90333
+

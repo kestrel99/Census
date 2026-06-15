@@ -1,28 +1,46 @@
-using Census.Domain;
 using Census.Import;
 using Xunit;
 
 namespace Census.Tests;
 
 /// <summary>
-/// Validates the importer against real NONMEM XML output files from four version IQ packages.
-/// Tests are skipped if the reference directories are not present on this machine.
+/// OPTIONAL extended sweep over the full, uncommitted NONMEM corpus on a developer machine.
+///
+/// This is NOT the importer's regression coverage — that lives in
+/// <see cref="NonmemFixtureCorpusTests"/> and <see cref="NonmemGroundTruthTests"/>, which run a
+/// committed fixture subset on every CI build and fail when it is absent. These tests only add
+/// breadth (all ~69 runs × 4 IQ packages) when the full corpus happens to be present, and they
+/// no-op otherwise so they never turn CI green on the strength of files CI cannot see.
+///
+/// To run them, point <c>CENSUS_NONMEM_CORPUS</c> at a folder whose subdirectories contain the
+/// NONMEM <c>Reference</c> output (or rely on the default download locations below).
 /// </summary>
 public sealed class RealWorldImporterTests
 {
-    private static readonly string[] RefDirs =
-    [
-        @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM730_IQ_160323\Reference",
-        @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM743_IQ_180814\Reference",
-        @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM750_IQ_210204\Reference",
-        @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM760_IQ_250422\Reference",
-    ];
+    private static List<string> ReferenceDirs()
+    {
+        var root = Environment.GetEnvironmentVariable("CENSUS_NONMEM_CORPUS");
+        if (!string.IsNullOrWhiteSpace(root) && Directory.Exists(root))
+        {
+            return Directory.EnumerateDirectories(root, "Reference", SearchOption.AllDirectories).ToList();
+        }
+
+        // Convenience fallback to the IQ package layout used during initial porting.
+        string[] defaults =
+        [
+            @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM730_IQ_160323\Reference",
+            @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM743_IQ_180814\Reference",
+            @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM750_IQ_210204\Reference",
+            @"C:\Users\justin\Downloads\NONMEM_tests\NONMEM760_IQ_250422\Reference",
+        ];
+        return defaults.Where(Directory.Exists).ToList();
+    }
 
     [Fact]
     public void Import_AllRealFiles_NoExceptions()
     {
-        var dirs = RefDirs.Where(Directory.Exists).ToList();
-        if (dirs.Count == 0) return;
+        var dirs = ReferenceDirs();
+        if (dirs.Count == 0) return; // optional supplement — see class summary.
 
         var importer = new NonmemXmlImporter();
         var failures = new List<string>();
@@ -58,8 +76,8 @@ public sealed class RealWorldImporterTests
     [Fact]
     public void Import_AllRealFiles_ReportsKeyFields()
     {
-        var dirs = RefDirs.Where(Directory.Exists).ToList();
-        if (dirs.Count == 0) return;
+        var dirs = ReferenceDirs();
+        if (dirs.Count == 0) return; // optional supplement — see class summary.
 
         var importer = new NonmemXmlImporter();
 
