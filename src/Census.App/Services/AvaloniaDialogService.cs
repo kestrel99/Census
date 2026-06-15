@@ -41,9 +41,9 @@ public sealed class AvaloniaDialogService : IDialogService
             {
                 Title = "Import NONMEM Run",
                 AllowMultiple = false,
+                // XML output is the only supported import format today; don't offer "All Files".
                 FileTypeFilter = [
                     new FilePickerFileType("NONMEM XML Output") { Patterns = ["*.xml"] },
-                    new FilePickerFileType("All Files") { Patterns = ["*"] },
                 ],
             });
         return files.Count > 0 ? files[0].TryGetLocalPath() : null;

@@ -75,7 +75,7 @@ internal sealed class ImportCommand : Command<ImportCommand.Settings>
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<source>")]
-        [Description("NONMEM XML/listing file to import.")]
+        [Description("NONMEM XML output file to import.")]
         public string Source { get; init; } = string.Empty;
 
         [CommandArgument(1, "<project>")]

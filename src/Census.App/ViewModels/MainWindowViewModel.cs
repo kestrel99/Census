@@ -140,9 +140,25 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var path = await _dialogs.OpenImportFileAsync();
         if (path is null) return;
-        var run = new NonmemXmlImporter().Import(path);
-        _store.SaveRun(run);
-        RefreshRuns();
+
+        var importer = new NonmemXmlImporter();
+        if (!importer.CanImport(path))
+        {
+            UpdateStatusText("Only NONMEM XML output (.xml) can be imported.");
+            return;
+        }
+
+        try
+        {
+            var run = importer.Import(path);
+            _store.SaveRun(run);
+            RefreshRuns();
+            UpdateStatusText($"Imported run {run.RunNo}.");
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText($"Import failed: {ex.Message}");
+        }
     }
 
     [RelayCommand(CanExecute = nameof(IsProjectOpen))]

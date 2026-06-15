@@ -10,9 +10,9 @@ app.Configure(config =>
     config.AddCommand<ListCommand>("list")
         .WithDescription("List the runs in a project.");
     config.AddCommand<ImportCommand>("import")
-        .WithDescription("Import a NONMEM run (XML or listing) into a project.");
+        .WithDescription("Import a NONMEM run (XML output) into a project.");
     config.AddCommand<ImportFolderCommand>("import-folder")
-        .WithDescription("Discover and import all runs under a folder.");
+        .WithDescription("Discover and import all NONMEM XML runs under a folder.");
     config.AddCommand<ExportRunCommand>("export-run")
         .WithDescription("Export a run report (default: html; also csv, latex).");
     config.AddCommand<CompareCommand>("compare")
