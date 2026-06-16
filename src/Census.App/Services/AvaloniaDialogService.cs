@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 
 namespace Census.App.Services;
@@ -86,5 +88,43 @@ public sealed class AvaloniaDialogService : IDialogService
                 FileTypeChoices = [new FilePickerFileType("ZIP Archive") { Patterns = ["*.zip"] }],
             });
         return file?.TryGetLocalPath();
+    }
+
+    public async Task<bool> ConfirmAsync(string title, string message)
+    {
+        var confirmed = false;
+        var dialog = new Window
+        {
+            Title = title,
+            Width = 440,
+            SizeToContent = SizeToContent.Height,
+            CanResize = false,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        };
+
+        var replace = new Button { Content = "Replace", IsDefault = true, MinWidth = 90 };
+        var cancel = new Button { Content = "Cancel", IsCancel = true, MinWidth = 90 };
+        replace.Click += (_, _) => { confirmed = true; dialog.Close(); };
+        cancel.Click += (_, _) => { confirmed = false; dialog.Close(); };
+
+        dialog.Content = new StackPanel
+        {
+            Margin = new Thickness(20),
+            Spacing = 20,
+            Children =
+            {
+                new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+                new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Spacing = 10,
+                    Children = { cancel, replace },
+                },
+            },
+        };
+
+        await dialog.ShowDialog(MainWindow);
+        return confirmed;
     }
 }

@@ -44,7 +44,47 @@ public sealed class SqliteProjectStore : IProjectStore
     {
         using var connection = OpenConnection();
         using var tx = connection.BeginTransaction();
+        InsertRun(connection, tx, run);
+        tx.Commit();
+    }
 
+    public bool RunExists(int iRunNo)
+    {
+        using var connection = OpenConnection();
+        return connection.ExecuteScalar<long>(
+            "SELECT COUNT(1) FROM runs WHERE IRunNo = @iRunNo;",
+            new { iRunNo }) > 0;
+    }
+
+    public void ReplaceRun(Run run)
+    {
+        using var connection = OpenConnection();
+        using var tx = connection.BeginTransaction();
+
+        // Preserve the user's annotations from the run being replaced. The importer never sets
+        // parent or flag, and a user may have edited the comment, so those must survive a re-import.
+        var existing = connection.QuerySingleOrDefault<ExistingAnnotations>(
+            "SELECT ParentNo, Comment, KeyRun FROM runs WHERE IRunNo = @IRunNo;",
+            new { run.IRunNo },
+            tx);
+
+        var merged = existing is null
+            ? run
+            : run with
+            {
+                ParentNo = existing.ParentNo ?? run.ParentNo,
+                Flag = (int)existing.KeyRun,
+                Comment = string.IsNullOrWhiteSpace(existing.Comment) ? run.Comment : existing.Comment,
+            };
+
+        // ON DELETE CASCADE clears the old estimations/parameters/warnings/file refs.
+        connection.Execute("DELETE FROM runs WHERE IRunNo = @IRunNo;", new { run.IRunNo }, tx);
+        InsertRun(connection, tx, merged);
+        tx.Commit();
+    }
+
+    private static void InsertRun(SqliteConnection connection, SqliteTransaction tx, Run run)
+    {
         var runId = connection.ExecuteScalar<long>(
             """
             INSERT INTO runs (RunNo, IRunNo, ParentNo, Comment, KeyRun, ObsRecs, Individuals,
@@ -121,8 +161,6 @@ public sealed class SqliteProjectStore : IProjectStore
                     tx);
             }
         }
-
-        tx.Commit();
     }
 
     public IReadOnlyList<Run> GetRuns()
@@ -284,4 +322,7 @@ public sealed class SqliteProjectStore : IProjectStore
     }
 
     private sealed record ParameterRow(string Kind, long Index, string? Label, double? Estimate, double? StandardError, double? Shrinkage);
+
+    // User-editable annotations carried over when a run is replaced on re-import.
+    private sealed record ExistingAnnotations(string? ParentNo, string? Comment, long KeyRun);
 }

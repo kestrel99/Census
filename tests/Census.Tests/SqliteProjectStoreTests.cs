@@ -85,6 +85,74 @@ public sealed class SqliteProjectStoreTests : IDisposable
     }
 
     [Fact]
+    public void SaveRun_DuplicateRunNumber_Throws()
+    {
+        var store = new SqliteProjectStore();
+        store.Create(_path);
+        store.SaveRun(SampleRun());
+
+        Assert.False(store.RunExists(99));
+        Assert.True(store.RunExists(27));
+
+        // A plain second insert of the same run number violates the unique index.
+        Assert.ThrowsAny<SqliteException>(() => store.SaveRun(SampleRun()));
+    }
+
+    [Fact]
+    public void ReplaceRun_OverwritesData_ButKeepsUserAnnotations()
+    {
+        var store = new SqliteProjectStore();
+        store.Create(_path);
+        store.SaveRun(SampleRun());
+
+        // The user annotates the imported run.
+        store.SetFlag("27", 5);
+        store.UpdateRun("27", parentNo: "9", comment: "my edited note");
+
+        // Re-import the same run number with fresh NONMEM data and no annotations
+        // (as a real importer would produce: parent null, flag 0, problem-title comment).
+        var reimport = SampleRun() with
+        {
+            ParentNo = null,
+            Flag = 0,
+            Comment = "PK base model",
+            Estimations =
+            [
+                new Estimation { Number = 1, Method = "FOCEI", Ofv = -2000.0 },
+            ],
+        };
+        store.ReplaceRun(reimport);
+
+        var reopened = new SqliteProjectStore();
+        reopened.Open(_path);
+        var run = Assert.Single(reopened.GetRuns());
+
+        // New estimation data replaced the old.
+        Assert.Equal(-2000.0, Assert.Single(run.Estimations).Ofv);
+
+        // User annotations survived the re-import.
+        Assert.Equal(5, run.Flag);
+        Assert.Equal("9", run.ParentNo);
+        Assert.Equal("my edited note", run.Comment);
+    }
+
+    [Fact]
+    public void ReplaceRun_WhenAbsent_InsertsAndUsesImportComment()
+    {
+        var store = new SqliteProjectStore();
+        store.Create(_path);
+
+        var run = SampleRun() with { Comment = "import comment" };
+        store.ReplaceRun(run); // no existing run with this number
+
+        var reopened = new SqliteProjectStore();
+        reopened.Open(_path);
+        var loaded = Assert.Single(reopened.GetRuns());
+        Assert.Equal("import comment", loaded.Comment);
+        Assert.Equal(3, loaded.Flag);
+    }
+
+    [Fact]
     public void Open_AppliesMigrationsIdempotently()
     {
         new SqliteProjectStore().Create(_path);

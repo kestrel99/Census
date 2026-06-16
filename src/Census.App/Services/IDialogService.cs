@@ -8,4 +8,7 @@ public interface IDialogService
     Task<string?> OpenImportFolderAsync();
     Task<string?> SaveReportAsync(string suggestedName);
     Task<string?> SaveArchiveAsync(string suggestedName);
+
+    /// <summary>Show a modal Replace/Cancel confirmation. Returns true if the user confirms.</summary>
+    Task<bool> ConfirmAsync(string title, string message);
 }

@@ -151,6 +151,25 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             var run = importer.Import(path);
+
+            if (_store.RunExists(run.IRunNo))
+            {
+                var replace = await _dialogs.ConfirmAsync(
+                    "Run already exists",
+                    $"Run {run.RunNo} already exists in this project.\n\nReplace it with the newly imported " +
+                    "results? Your comment, flag and parent run will be kept.");
+                if (!replace)
+                {
+                    UpdateStatusText($"Import cancelled — run {run.RunNo} already exists.");
+                    return;
+                }
+
+                _store.ReplaceRun(run);
+                RefreshRuns();
+                UpdateStatusText($"Replaced run {run.RunNo}.");
+                return;
+            }
+
             _store.SaveRun(run);
             RefreshRuns();
             UpdateStatusText($"Imported run {run.RunNo}.");
@@ -168,19 +187,50 @@ public partial class MainWindowViewModel : ObservableObject
         if (folder is null) return;
         var importer = new NonmemXmlImporter();
         var files = Directory.EnumerateFiles(folder, "*.xml", SearchOption.AllDirectories).ToList();
-        int imported = 0;
+
+        var parsed = new List<Run>();
+        int failed = 0;
         foreach (var file in files)
+        {
+            try { parsed.Add(importer.Import(file)); }
+            catch { failed++; /* skip unparseable files */ }
+        }
+
+        // Ask once whether to replace any runs that already exist, rather than prompting per file.
+        var existing = parsed.Count(r => _store.RunExists(r.IRunNo));
+        var replaceExisting = false;
+        if (existing > 0)
+        {
+            replaceExisting = await _dialogs.ConfirmAsync(
+                "Some runs already exist",
+                $"{existing} of the imported runs already exist in this project.\n\nReplace them with the " +
+                "newly imported results? Comments, flags and parents will be kept. Choose Cancel to skip " +
+                "them and import only new runs.");
+        }
+
+        int imported = 0, replaced = 0, skipped = 0;
+        foreach (var run in parsed)
         {
             try
             {
-                var run = importer.Import(file);
-                _store.SaveRun(run);
-                imported++;
+                if (_store.RunExists(run.IRunNo))
+                {
+                    if (replaceExisting) { _store.ReplaceRun(run); replaced++; }
+                    else { skipped++; }
+                }
+                else
+                {
+                    _store.SaveRun(run);
+                    imported++;
+                }
             }
-            catch { /* skip unparseable files */ }
+            catch { failed++; }
         }
-        if (imported > 0) RefreshRuns();
-        UpdateStatusText($"Imported {imported} of {files.Count} XML files.");
+
+        if (imported + replaced > 0) RefreshRuns();
+        UpdateStatusText(
+            $"Imported {imported}, replaced {replaced}, skipped {skipped}" +
+            (failed > 0 ? $", {failed} failed." : "."));
     }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]

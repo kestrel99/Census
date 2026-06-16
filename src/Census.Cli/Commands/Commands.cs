@@ -81,6 +81,14 @@ internal sealed class ImportCommand : Command<ImportCommand.Settings>
         [CommandArgument(1, "<project>")]
         [Description("Target .cen project file.")]
         public string Project { get; init; } = string.Empty;
+
+        [CommandOption("-y|--replace")]
+        [Description("Replace an existing run with the same number (keeps comment, flag and parent).")]
+        public bool Replace { get; init; }
+
+        [CommandOption("--skip-existing")]
+        [Description("Skip a run whose number already exists instead of prompting.")]
+        public bool SkipExisting { get; init; }
     }
 
     protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellation)
@@ -107,6 +115,20 @@ internal sealed class ImportCommand : Command<ImportCommand.Settings>
                 store.Create(settings.Project);
 
             var run = importer.Import(settings.Source);
+
+            if (store.RunExists(run.IRunNo))
+            {
+                if (!ImportDuplicates.Resolve(run.RunNo, settings.Replace, settings.SkipExisting))
+                {
+                    AnsiConsole.MarkupLine($"[yellow]Skipped[/] existing run [bold]{run.RunNo}[/].");
+                    return 0;
+                }
+
+                store.ReplaceRun(run);
+                AnsiConsole.MarkupLine($"[green]Replaced[/] run [bold]{run.RunNo}[/] from {settings.Source}");
+                return 0;
+            }
+
             store.SaveRun(run);
             AnsiConsole.MarkupLine($"[green]Imported[/] run [bold]{run.RunNo}[/] from {settings.Source}");
             return 0;
@@ -116,6 +138,36 @@ internal sealed class ImportCommand : Command<ImportCommand.Settings>
             AnsiConsole.MarkupLine($"[red]Import failed: {ex.Message}[/]");
             return 1;
         }
+    }
+}
+
+/// <summary>Shared resolution of what to do when an imported run number already exists.</summary>
+internal static class ImportDuplicates
+{
+    // Explicit flags win; otherwise prompt when the console is interactive; otherwise skip.
+    // We never overwrite an existing run without explicit consent (a flag or a "yes" at the prompt).
+    public static bool Resolve(string runNo, bool replace, bool skipExisting)
+    {
+        if (replace)
+        {
+            return true;
+        }
+
+        if (skipExisting)
+        {
+            return false;
+        }
+
+        if (AnsiConsole.Profile.Capabilities.Interactive)
+        {
+            return AnsiConsole.Confirm(
+                $"Run [bold]{runNo}[/] already exists. Replace it (keeping comment, flag and parent)?",
+                defaultValue: false);
+        }
+
+        AnsiConsole.MarkupLine(
+            $"[yellow]Run {runNo} already exists; skipped.[/] Pass [bold]--replace[/] to overwrite.");
+        return false;
     }
 }
 
@@ -130,6 +182,10 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
         [CommandArgument(1, "<project>")]
         [Description("Target .cen project file.")]
         public string Project { get; init; } = string.Empty;
+
+        [CommandOption("-y|--replace")]
+        [Description("Replace runs whose number already exists (keeps comment, flag and parent). Default: skip them.")]
+        public bool Replace { get; init; }
     }
 
     protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellation)
@@ -149,6 +205,7 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
         var files = Directory.GetFiles(settings.Folder, "*.xml", SearchOption.AllDirectories);
 
         var imported = 0;
+        var replaced = 0;
         var skipped = 0;
         var failed = 0;
 
@@ -171,8 +228,24 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
                     try
                     {
                         var run = imp.Import(file);
-                        store.SaveRun(run);
-                        imported++;
+                        if (store.RunExists(run.IRunNo))
+                        {
+                            // Batch import does not prompt per file; --replace overwrites, default skips.
+                            if (settings.Replace)
+                            {
+                                store.ReplaceRun(run);
+                                replaced++;
+                            }
+                            else
+                            {
+                                skipped++;
+                            }
+                        }
+                        else
+                        {
+                            store.SaveRun(run);
+                            imported++;
+                        }
                     }
                     catch
                     {
@@ -187,6 +260,7 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
         summary.AddColumn("Result");
         summary.AddColumn("Count");
         summary.AddRow("[green]Imported[/]", imported.ToString());
+        summary.AddRow("[blue]Replaced[/]", replaced.ToString());
         summary.AddRow("[grey]Skipped[/]", skipped.ToString());
         summary.AddRow("[red]Failed[/]", failed.ToString());
         AnsiConsole.Write(summary);
