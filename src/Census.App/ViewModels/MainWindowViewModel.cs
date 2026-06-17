@@ -185,19 +185,12 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var folder = await _dialogs.OpenImportFolderAsync();
         if (folder is null) return;
-        var importer = new NonmemXmlImporter();
-        var files = Directory.EnumerateFiles(folder, "*.xml", SearchOption.AllDirectories).ToList();
 
-        var parsed = new List<Run>();
-        int failed = 0;
-        foreach (var file in files)
-        {
-            try { parsed.Add(importer.Import(file)); }
-            catch { failed++; /* skip unparseable files */ }
-        }
+        var scan = new FolderImporter(new NonmemXmlImporter()).ImportFolder(folder);
+        var failures = scan.Failures.ToList();
 
         // Ask once whether to replace any runs that already exist, rather than prompting per file.
-        var existing = parsed.Count(r => _store.RunExists(r.IRunNo));
+        var existing = scan.Runs.Count(r => _store.RunExists(r.IRunNo));
         var replaceExisting = false;
         if (existing > 0)
         {
@@ -209,7 +202,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         int imported = 0, replaced = 0, skipped = 0;
-        foreach (var run in parsed)
+        foreach (var run in scan.Runs)
         {
             try
             {
@@ -224,13 +217,23 @@ public partial class MainWindowViewModel : ObservableObject
                     imported++;
                 }
             }
-            catch { failed++; }
+            catch (Exception ex)
+            {
+                var source = run.Files.FirstOrDefault()?.Path ?? $"run {run.RunNo}";
+                failures.Add(new ImportFailure(source, ex.Message));
+            }
         }
 
         if (imported + replaced > 0) RefreshRuns();
-        UpdateStatusText(
-            $"Imported {imported}, replaced {replaced}, skipped {skipped}" +
-            (failed > 0 ? $", {failed} failed." : "."));
+        UpdateStatusText($"Imported {imported}, replaced {replaced}, skipped {skipped}, {failures.Count} failed.");
+
+        if (failures.Count > 0)
+        {
+            var details = string.Join("\n", failures.Select(f => $"• {Path.GetFileName(f.Path)} — {f.Error}"));
+            await _dialogs.ShowMessageAsync(
+                "Some files could not be imported",
+                $"{failures.Count} file(s) failed to import:\n\n{details}");
+        }
     }
 
     [RelayCommand(CanExecute = nameof(IsRunSelected))]

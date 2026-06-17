@@ -127,4 +127,42 @@ public sealed class AvaloniaDialogService : IDialogService
         await dialog.ShowDialog(MainWindow);
         return confirmed;
     }
+
+    public async Task ShowMessageAsync(string title, string message)
+    {
+        var dialog = new Window
+        {
+            Title = title,
+            Width = 480,
+            MaxHeight = 480,
+            SizeToContent = SizeToContent.Height,
+            CanResize = false,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        };
+
+        var ok = new Button { Content = "OK", IsDefault = true, IsCancel = true, MinWidth = 90 };
+        ok.Click += (_, _) => dialog.Close();
+
+        dialog.Content = new StackPanel
+        {
+            Margin = new Thickness(20),
+            Spacing = 20,
+            Children =
+            {
+                new ScrollViewer
+                {
+                    MaxHeight = 340,
+                    Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+                },
+                new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Children = { ok },
+                },
+            },
+        };
+
+        await dialog.ShowDialog(MainWindow);
+    }
 }

@@ -202,32 +202,23 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
         else
             store.Create(settings.Project);
 
-        var files = Directory.GetFiles(settings.Folder, "*.xml", SearchOption.AllDirectories);
+        var scan = new FolderImporter(new NonmemXmlImporter()).ImportFolder(settings.Folder);
 
         var imported = 0;
         var replaced = 0;
         var skipped = 0;
-        var failed = 0;
+        var failures = scan.Failures.ToList();
 
         AnsiConsole.Progress()
             .AutoClear(false)
             .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new SpinnerColumn())
             .Start(ctx =>
             {
-                var task = ctx.AddTask("[green]Importing[/]", maxValue: files.Length);
-                foreach (var file in files)
+                var task = ctx.AddTask("[green]Saving[/]", maxValue: scan.Runs.Count);
+                foreach (var run in scan.Runs)
                 {
-                    var imp = new NonmemXmlImporter();
-                    if (!imp.CanImport(file))
-                    {
-                        skipped++;
-                        task.Increment(1);
-                        continue;
-                    }
-
                     try
                     {
-                        var run = imp.Import(file);
                         if (store.RunExists(run.IRunNo))
                         {
                             // Batch import does not prompt per file; --replace overwrites, default skips.
@@ -247,9 +238,10 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
                             imported++;
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        failed++;
+                        var source = run.Files.FirstOrDefault()?.Path ?? $"run {run.RunNo}";
+                        failures.Add(new ImportFailure(source, ex.Message));
                     }
 
                     task.Increment(1);
@@ -262,8 +254,21 @@ internal sealed class ImportFolderCommand : Command<ImportFolderCommand.Settings
         summary.AddRow("[green]Imported[/]", imported.ToString());
         summary.AddRow("[blue]Replaced[/]", replaced.ToString());
         summary.AddRow("[grey]Skipped[/]", skipped.ToString());
-        summary.AddRow("[red]Failed[/]", failed.ToString());
+        summary.AddRow("[red]Failed[/]", failures.Count.ToString());
         AnsiConsole.Write(summary);
+
+        if (failures.Count > 0)
+        {
+            var table = new Table().Border(TableBorder.Rounded).Title("[red]Failed imports[/]");
+            table.AddColumn("File");
+            table.AddColumn("Error");
+            foreach (var f in failures)
+            {
+                table.AddRow(Markup.Escape(Path.GetFileName(f.Path)), Markup.Escape(f.Error));
+            }
+
+            AnsiConsole.Write(table);
+        }
 
         return 0;
     }

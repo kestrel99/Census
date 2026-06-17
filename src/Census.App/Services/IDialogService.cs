@@ -11,4 +11,7 @@ public interface IDialogService
 
     /// <summary>Show a modal Replace/Cancel confirmation. Returns true if the user confirms.</summary>
     Task<bool> ConfirmAsync(string title, string message);
+
+    /// <summary>Show a modal informational message with a single OK button.</summary>
+    Task ShowMessageAsync(string title, string message);
 }
