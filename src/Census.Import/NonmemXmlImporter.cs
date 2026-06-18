@@ -144,7 +144,7 @@ public sealed class NonmemXmlImporter : IRunImporter
     }
 
     /// <summary>Parse from an XML string. Exposed for testing without disk I/O.</summary>
-    public Run ImportXml(string xml, string sourcePath)
+    public static Run ImportXml(string xml, string sourcePath)
     {
         var doc = XDocument.Parse(xml);
         var root = doc.Root!;
@@ -538,6 +538,12 @@ public sealed class NonmemXmlImporter : IRunImporter
         return i < stem.Length - 1 ? stem[(i + 1)..] : stem;
     }
 
+    // MD5 here is a non-cryptographic file fingerprint used to detect whether a run's output file
+    // has changed, matching the legacy Census behaviour and any existing .cen records. It is never
+    // used as a security or integrity check, so the "MD5 is broken" analyzer rule does not apply.
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Security", "CA5351:Do Not Use Broken Cryptographic Algorithms",
+        Justification = "MD5 is a legacy file fingerprint, not a security/integrity check.")]
     private static string ComputeMd5(string filePath)
     {
         var bytes = File.ReadAllBytes(filePath);

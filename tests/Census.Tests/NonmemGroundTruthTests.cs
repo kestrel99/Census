@@ -31,7 +31,7 @@ public sealed class NonmemGroundTruthTests
     public void RunR001_MatchesRawNonmemOutput(string version)
     {
         var path = Path.Combine(CorpusDir, version, "runR001.xml");
-        var run = new NonmemXmlImporter().ImportXml(File.ReadAllText(path), path);
+        var run = NonmemXmlImporter.ImportXml(File.ReadAllText(path), path);
 
         var est = Assert.Single(run.Estimations);
         Assert.Equal("FOCEI", est.Method, ignoreCase: true);

@@ -219,7 +219,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
             catch (Exception ex)
             {
-                var source = run.Files.FirstOrDefault()?.Path ?? $"run {run.RunNo}";
+                var source = run.Files.Count > 0 ? run.Files[0].Path : $"run {run.RunNo}";
                 failures.Add(new ImportFailure(source, ex.Message));
             }
         }

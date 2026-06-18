@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Census.App.Models;
 
@@ -23,7 +24,12 @@ public sealed class JsonSettingsService : ISettingsService
                 return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
             }
         }
-        catch { /* ignore corrupt settings */ }
+        catch (Exception ex)
+        {
+            // Corrupt or unreadable settings fall back to defaults, but the failure is surfaced
+            // to diagnostics rather than hidden, so it can be traced in the field.
+            Trace.TraceError($"Failed to load settings from '{SettingsPath}': {ex}");
+        }
         return new AppSettings();
     }
 
@@ -35,7 +41,12 @@ public sealed class JsonSettingsService : ISettingsService
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
             File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true }));
         }
-        catch { /* ignore save failures */ }
+        catch (Exception ex)
+        {
+            // Don't crash the UI on a settings write failure, but surface it to diagnostics so a
+            // lost preference can be traced instead of silently disappearing.
+            Trace.TraceError($"Failed to save settings to '{SettingsPath}': {ex}");
+        }
     }
 
     public void UpdateSettings(Action<AppSettings> mutate)

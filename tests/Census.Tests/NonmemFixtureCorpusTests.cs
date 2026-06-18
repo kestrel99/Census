@@ -95,7 +95,7 @@ public sealed class NonmemFixtureCorpusTests : VerifyBase
         var path = Path.Combine(CorpusDir, version, run + ".xml");
         // ImportXml (not Import) keeps the result deterministic: no absolute sibling-file paths
         // and no machine-specific MD5, so the snapshot is stable across machines and CI.
-        return new NonmemXmlImporter().ImportXml(File.ReadAllText(path), path);
+        return NonmemXmlImporter.ImportXml(File.ReadAllText(path), path);
     }
 
     private static void AppendRun(StringBuilder sb, string version, string run, Run r)

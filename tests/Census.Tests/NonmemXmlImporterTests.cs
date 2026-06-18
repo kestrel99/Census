@@ -154,7 +154,7 @@ public sealed class NonmemXmlImporterTests
             </output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "run5.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "run5.xml");
         var est = Assert.Single(run.Estimations);
         Assert.Equal("MINIMIZATION TERMINATED", Assert.Single(est.Warnings));
     }
@@ -196,7 +196,7 @@ public sealed class NonmemXmlImporterTests
             </output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "run3.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "run3.xml");
         var omega = Assert.Single(run.Estimations[0].Parameters, p => p.Kind == ParameterKind.Omega);
         Assert.Equal(8.5, omega.Shrinkage!.Value, precision: 2);
     }
@@ -223,7 +223,7 @@ public sealed class NonmemXmlImporterTests
             </output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "sim1.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "sim1.xml");
         Assert.Empty(run.Estimations);
         Assert.Equal("1", run.RunNo);
     }
@@ -259,7 +259,7 @@ public sealed class NonmemXmlImporterTests
             </nm:output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR010.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "runR010.xml");
         var est = Assert.Single(run.Estimations);
         Assert.Equal(3.0, est.ConditionNumber!.Value, precision: 6);
     }
@@ -340,7 +340,7 @@ public sealed class NonmemXmlImporterTests
             </nm:output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR012.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "runR012.xml");
         var est = Assert.Single(run.Estimations);
 
         Assert.NotNull(est.Covariance);
@@ -379,7 +379,7 @@ public sealed class NonmemXmlImporterTests
             </nm:output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR011.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "runR011.xml");
         var est = Assert.Single(run.Estimations);
         Assert.Equal(4.0, est.ConditionNumber!.Value, precision: 6);
     }
@@ -417,7 +417,7 @@ public sealed class NonmemXmlImporterTests
             </output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "run9.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "run9.xml");
 
         Assert.Equal("One-compartment base model", run.Comment);
         Assert.Equal("2024-01-15T10:30:00", run.StartDateTime);
@@ -476,7 +476,7 @@ public sealed class NonmemXmlImporterTests
             </nm:output>
             """;
 
-        var run = new NonmemXmlImporter().ImportXml(xml, sourcePath: "runR001.xml");
+        var run = NonmemXmlImporter.ImportXml(xml, sourcePath: "runR001.xml");
         var est = Assert.Single(run.Estimations);
 
         var omegas = est.Parameters.Where(p => p.Kind == ParameterKind.Omega).ToList();
