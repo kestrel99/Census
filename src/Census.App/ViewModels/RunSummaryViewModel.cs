@@ -18,20 +18,11 @@ public sealed class RunSummaryViewModel
         Method = lastEst?.Method ?? string.Empty;
         Ofv = lastEst?.Ofv?.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
 
-        // Compute dOFV relative to parent
-        if (run.ParentNo is not null
-            && allByRunNo.TryGetValue(run.ParentNo, out var parent)
-            && lastEst?.Ofv.HasValue == true
-            && parent.Estimations.Count > 0
-            && parent.Estimations[^1].Ofv.HasValue)
-        {
-            var delta = lastEst.Ofv!.Value - parent.Estimations[^1].Ofv!.Value;
-            DOfv = delta.ToString("+0.000;-0.000;0.000", System.Globalization.CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            DOfv = string.Empty;
-        }
+        // dOFV is derived against the parent run (never stored). See Census.Domain.OfvAnalysis.
+        var parent = run.ParentNo is not null && allByRunNo.TryGetValue(run.ParentNo, out var p) ? p : null;
+        DOfv = OfvAnalysis.DeltaOfv(run, parent)
+            ?.ToString("+0.000;-0.000;0.000", System.Globalization.CultureInfo.InvariantCulture)
+            ?? string.Empty;
 
         ConditionNumber = lastEst?.ConditionNumber?.ToString("0", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
         ObsRecs = run.ObsRecs?.ToString() ?? string.Empty;

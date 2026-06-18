@@ -197,7 +197,6 @@ public sealed class SqliteProjectStoreTests : IDisposable
                 Number = 1,
                 Method = "FOCEI",
                 Ofv = -1234.56,
-                DOfv = -10.0,
                 ConditionNumber = 12.3,
                 EstimationTime = 123.4,
                 CovarianceTime = 45.6,

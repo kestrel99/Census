@@ -32,20 +32,17 @@ public sealed class CompareViewModel
 
         static Estimation? Last(Run r) => r.Estimations.Count > 0 ? r.Estimations[^1] : null;
 
-        var referenceOfv = ordered.Count > 0 ? Last(ordered[0])?.Ofv : null;
+        // dOFV is derived against the first selected run (the reference). See Census.Domain.OfvAnalysis.
+        var reference = ordered.Count > 0 ? ordered[0] : null;
 
         var rows = new List<CompareRowViewModel>
         {
             new("OFV", ordered.Select(r =>
-                Last(r)?.Ofv?.ToString("0.000", CultureInfo.InvariantCulture) ?? string.Empty).ToList()),
+                r.FinalOfv()?.ToString("0.000", CultureInfo.InvariantCulture) ?? string.Empty).ToList()),
 
             new("dOFV (vs first)", ordered.Select(r =>
-            {
-                var ofv = Last(r)?.Ofv;
-                if (ofv is null || referenceOfv is null)
-                    return string.Empty;
-                return (ofv.Value - referenceOfv.Value).ToString("+0.000;-0.000;0.000", CultureInfo.InvariantCulture);
-            }).ToList()),
+                OfvAnalysis.DeltaOfv(r, reference)
+                    ?.ToString("+0.000;-0.000;0.000", CultureInfo.InvariantCulture) ?? string.Empty).ToList()),
 
             new("Condition no.", ordered.Select(r =>
                 Last(r)?.ConditionNumber?.ToString("0", CultureInfo.InvariantCulture) ?? string.Empty).ToList()),

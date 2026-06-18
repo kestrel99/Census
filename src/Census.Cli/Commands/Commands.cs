@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text;
 using Census.Archive;
+using Census.Domain;
 using Census.Import;
 using Census.Reports;
 using Census.Storage;
@@ -366,14 +367,8 @@ internal sealed class CompareCommand : Command<CompareCommand.Settings>
         {
             var lastEst = run.Estimations.Count > 0 ? run.Estimations[^1] : null;
 
-            double? dofv = null;
-            if (run.ParentNo is not null
-                && lookup.TryGetValue(run.ParentNo, out var parent)
-                && run.Estimations.Count > 0
-                && parent.Estimations.Count > 0)
-            {
-                dofv = run.Estimations[^1].Ofv - parent.Estimations[^1].Ofv;
-            }
+            var parent = run.ParentNo is not null && lookup.TryGetValue(run.ParentNo, out var p) ? p : null;
+            var dofv = OfvAnalysis.DeltaOfv(run, parent);
 
             var dofvStr = dofv switch
             {

@@ -61,9 +61,6 @@ public sealed record Estimation
     /// <summary>Objective function value.</summary>
     public double? Ofv { get; init; }
 
-    /// <summary>Change in OFV relative to the parent run, if computed.</summary>
-    public double? DOfv { get; init; }
-
     /// <summary>Condition number of the covariance step, if available.</summary>
     public double? ConditionNumber { get; init; }
 

@@ -123,8 +123,8 @@ public sealed class SqliteProjectStore : IProjectStore
         {
             var estId = connection.ExecuteScalar<long>(
                 """
-                INSERT INTO estimations (RunId, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime, CovarianceJson, CorrelationJson)
-                VALUES (@runId, @Number, @Method, @Ofv, @DOfv, @ConditionNumber, @EstimationTime, @CovarianceTime, @CovarianceJson, @CorrelationJson);
+                INSERT INTO estimations (RunId, Number, Method, Ofv, ConditionNumber, EstimationTime, CovarianceTime, CovarianceJson, CorrelationJson)
+                VALUES (@runId, @Number, @Method, @Ofv, @ConditionNumber, @EstimationTime, @CovarianceTime, @CovarianceJson, @CorrelationJson);
                 SELECT last_insert_rowid();
                 """,
                 new
@@ -133,7 +133,6 @@ public sealed class SqliteProjectStore : IProjectStore
                     estimation.Number,
                     estimation.Method,
                     estimation.Ofv,
-                    estimation.DOfv,
                     estimation.ConditionNumber,
                     estimation.EstimationTime,
                     estimation.CovarianceTime,
@@ -183,7 +182,7 @@ public sealed class SqliteProjectStore : IProjectStore
                 new { id = r.Id }).ToList();
 
             var estRows = connection.Query<EstimationRow>(
-                "SELECT Id, Number, Method, Ofv, DOfv, ConditionNumber, EstimationTime, CovarianceTime, CovarianceJson, CorrelationJson FROM estimations WHERE RunId = @id ORDER BY Number;",
+                "SELECT Id, Number, Method, Ofv, ConditionNumber, EstimationTime, CovarianceTime, CovarianceJson, CorrelationJson FROM estimations WHERE RunId = @id ORDER BY Number;",
                 new { id = r.Id }).ToList();
 
             var estimations = new List<Estimation>(estRows.Count);
@@ -212,7 +211,6 @@ public sealed class SqliteProjectStore : IProjectStore
                     Number = (int)e.Number,
                     Method = e.Method,
                     Ofv = e.Ofv,
-                    DOfv = e.DOfv,
                     ConditionNumber = e.ConditionNumber,
                     EstimationTime = e.EstimationTime,
                     CovarianceTime = e.CovarianceTime,
@@ -281,7 +279,7 @@ public sealed class SqliteProjectStore : IProjectStore
     private sealed record RunRow(long Id, string RunNo, long IRunNo, string? ParentNo, string? Comment, long KeyRun, long? ObsRecs, long? Individuals,
         string? StartDateTime, string? StopDateTime, double? TotalCpuTime, double? PostElapsedTime, double? FinalOutputElapsedTime);
 
-    private sealed record EstimationRow(long Id, long Number, string? Method, double? Ofv, double? DOfv, double? ConditionNumber, double? EstimationTime, double? CovarianceTime, string? CovarianceJson, string? CorrelationJson);
+    private sealed record EstimationRow(long Id, long Number, string? Method, double? Ofv, double? ConditionNumber, double? EstimationTime, double? CovarianceTime, string? CovarianceJson, string? CorrelationJson);
 
     // Matrices are stored as JSON (read/displayed whole, never queried per-element).
     private static readonly JsonSerializerOptions MatrixJsonOptions = new();
